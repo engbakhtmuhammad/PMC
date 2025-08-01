@@ -254,7 +254,7 @@
             overflow: hidden;
             margin-bottom: 2rem;
             box-shadow: var(--shadow-lg);
-            height: 500px;
+            height: 600px;  /* Increased height for better visibility */
             position: relative;
             transition: all 0.3s ease;
         }
@@ -273,6 +273,28 @@
         #map {
             height: 100%;
             width: 100%;
+            min-height: 600px;  /* Ensure minimum height */
+        }
+
+        /* Ensure Leaflet map tiles load properly */
+        .leaflet-container {
+            height: 100% !important;
+            width: 100% !important;
+            background: #f8f9fa !important;
+        }
+
+        .leaflet-tile-container {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Improve tile loading visibility */
+        .leaflet-tile {
+            filter: brightness(1.02) contrast(1.02);
         }
 
         /* Table Styles */

@@ -196,7 +196,7 @@ class SchoolUpgradeAnalyzer:
         except:
             return float('inf')
     
-    def analyze_upgrade_needs(self, radius_km=25, max_candidates=500, districts=None, 
+    def analyze_upgrade_needs(self, radius_km=25, min_enrollment=20, max_candidates=500, districts=None, 
                              include_functional=True, include_non_functional=False, 
                              analyze_levels=None, genders=None):
         """Analyze schools that need upgrading - with full filtering control including gender"""
@@ -237,7 +237,7 @@ class SchoolUpgradeAnalyzer:
         if include_functional:
             quality_functional = filtered_schools[
                 (filtered_schools['FunctionalStatus'] == 'Functional') &
-                (filtered_schools['TotalStudentProfileEntered'] >= 20) &  # Minimum enrollment
+                (filtered_schools['TotalStudentProfileEntered'] >= min_enrollment) &  # Use dynamic minimum enrollment
                 (~filtered_schools['BuildingCondition'].isin(['Dangerous Condition'])) &
                 (filtered_schools['Building'] == 'Yes')
             ].copy()
@@ -356,7 +356,7 @@ class SchoolUpgradeAnalyzer:
         }
     
     def create_upgrade_map(self, filtered_schools_df=None):
-        """Create interactive map showing filtered schools and upgrade recommendations"""
+        """Create interactive map showing filtered schools and upgrade recommendations with enhanced features"""
         # Use filtered schools if provided, otherwise use all schools
         schools_to_show = filtered_schools_df if filtered_schools_df is not None else self.schools_df
         
@@ -377,103 +377,193 @@ class SchoolUpgradeAnalyzer:
         center_lat = valid_coords['_yCord'].mean()
         center_lon = valid_coords['_xCord'].mean()
         
-        # Create map
-        m = folium.Map(location=[center_lat, center_lon], zoom_start=10)
+        # Create map with multiple tile layers
+        m = folium.Map(
+            location=[center_lat, center_lon], 
+            zoom_start=10,
+            tiles=None,
+            max_zoom=18,
+            min_zoom=5
+        )
+        
+        # Add multiple tile layers with proper attribution
+        folium.TileLayer(
+            tiles='OpenStreetMap',
+            name='Street Map',
+            overlay=False,
+            control=True
+        ).add_to(m)
+        
+        folium.TileLayer(
+            tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+            attr='Esri',
+            name='Satellite View',
+            overlay=False,
+            control=True
+        ).add_to(m)
+        
+        folium.TileLayer(
+            tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+            attr='Esri',
+            name='Terrain Map',
+            overlay=False,
+            control=True
+        ).add_to(m)
         
         # Color mapping for school levels
         level_colors = {
-            'Primary': 'blue',
-            'Middle': 'green', 
-            'High': 'orange',
-            'Higher Secondary': 'red'
+            'Primary': '#3498db',
+            'Middle': '#2ecc71', 
+            'High': '#f39c12',
+            'Higher Secondary': '#e74c3c'
         }
         
-        # Upgrade recommendation colors (brighter/more distinctive)
+        # Upgrade recommendation colors (more vibrant for better visibility)
         upgrade_colors = {
-            'Primary': 'lightblue',
-            'Middle': 'lightgreen', 
-            'High': 'yellow',
-            'Higher Secondary': 'pink'
+            'Primary': 'red',          # Red for Primary upgrades
+            'Middle': 'green',         # Green for Middle upgrades  
+            'High': 'orange',          # Orange for High upgrades
+            'Higher Secondary': 'purple'  # Purple for Higher Secondary upgrades
         }
         
-        # Add filtered schools (smaller markers)
+        # Create upgrade candidates set for quick lookup
+        upgrade_bemis_codes = set()
+        if hasattr(self, 'upgrade_candidates') and len(self.upgrade_candidates) > 0:
+            upgrade_bemis_codes = set(self.upgrade_candidates['BemisCode'].unique())
+        
+        # Add regular schools (smaller markers)
         for _, school in schools_to_show.iterrows():
             # Skip if coordinates are missing
             if pd.isna(school.get('_yCord')) or pd.isna(school.get('_xCord')):
                 continue
+            
+            # Skip if this is an upgrade candidate (will be plotted separately)
+            if school['BemisCode'] in upgrade_bemis_codes:
+                continue
                 
-            color = level_colors.get(school['SchoolLevel'], 'gray')
+            color = level_colors.get(school['SchoolLevel'], '#95a5a6')
             
             popup_html = f"""
-            <b>{school['SchoolName']}</b><br>
-            BEMIS: {school['BemisCode']}<br>
-            Level: {school['SchoolLevel']}<br>
-            District: {school['District']}<br>
-            Tehsil: {school['Tehsil']}<br>
-            Students: {school['TotalStudentProfileEntered']}<br>
-            Building: {school['Building']}<br>
-            Condition: {school['BuildingCondition']}
+            <div style="width: 250px; font-family: 'Poppins', sans-serif;">
+                <h5 style="color: #2c3e50; margin-bottom: 10px; border-bottom: 2px solid #3498db; padding-bottom: 5px;">
+                    <i class="fas fa-school"></i> {school['SchoolName']}
+                </h5>
+                <p><strong>BEMIS Code:</strong> {school['BemisCode']}</p>
+                <p><strong>Level:</strong> <span style="color: {color}; font-weight: bold;">{school['SchoolLevel']}</span></p>
+                <p><strong>District:</strong> {school['District']}</p>
+                <p><strong>Tehsil:</strong> {school['Tehsil']}</p>
+                <p><strong>Gender:</strong> {school['Gender']}</p>
+                <p><strong>Students:</strong> {school['TotalStudentProfileEntered']}</p>
+                <p><strong>Building:</strong> {school['Building']}</p>
+                <p><strong>Condition:</strong> {school['BuildingCondition']}</p>
+                <p><strong>Status:</strong> {school['FunctionalStatus']}</p>
+            </div>
             """
             
             folium.CircleMarker(
                 location=[school['_yCord'], school['_xCord']],
-                radius=5,
+                radius=6,  # Smaller radius for regular schools
                 popup=folium.Popup(popup_html, max_width=300),
                 tooltip=f"{school['SchoolName']} ({school['SchoolLevel']})",
-                color=color,
+                color='white',
+                weight=2,
                 fill=True,
                 fillColor=color,
-                fillOpacity=0.6
+                fillOpacity=0.8
             ).add_to(m)
         
-        # Add upgrade candidates (larger markers with different icon)
+        # Add upgrade candidates (larger, more prominent markers)
         if hasattr(self, 'upgrade_candidates') and len(self.upgrade_candidates) > 0:
             for _, school in self.upgrade_candidates.iterrows():
-                # Skip if coordinates are missing
-                if pd.isna(school.get('_yCord')) or pd.isna(school.get('_xCord')):
+                # Skip if coordinates are missing - check both coordinate naming conventions
+                lat = school.get('Latitude') or school.get('_yCord')
+                lon = school.get('Longitude') or school.get('_xCord')
+                
+                if pd.isna(lat) or pd.isna(lon):
                     continue
                     
-                upgrade_color = upgrade_colors.get(school['CurrentLevel'], 'red')
+                upgrade_color = upgrade_colors.get(school['CurrentLevel'], '#e74c3c')
                 
                 popup_html = f"""
-                <b>{school['SchoolName']}</b><br>
-                BEMIS: {school['BemisCode']}<br>
-                <hr>
-                <b style="color: red;">UPGRADE RECOMMENDED</b><br>
-                {school['CurrentLevel']} → {school['RecommendedLevel']}<br>
-                <hr>
-                District: {school['District']}<br>
-                Tehsil: {school['Tehsil']}<br>
-                Students: {school['TotalStudentProfileEntered']}<br>
-                Building: {school['Building']}<br>
-                <hr>
-                <b>Reason:</b> {school['UpgradeReason']}
+                <div style="width: 300px; font-family: 'Poppins', sans-serif;">
+                    <h4 style="color: #e74c3c; margin-bottom: 10px; border-bottom: 3px solid #e74c3c; padding-bottom: 5px;">
+                        <i class="fas fa-arrow-up"></i> UPGRADE RECOMMENDED
+                    </h4>
+                    <h5 style="color: #2c3e50; margin-bottom: 10px;">
+                        <i class="fas fa-school"></i> {school['SchoolName']}
+                    </h5>
+                    <div style="background: #f8d7da; padding: 10px; border-radius: 5px; margin: 10px 0;">
+                        <strong>Upgrade Path:</strong><br>
+                        <span style="font-size: 16px; color: #721c24;">
+                            {school['CurrentLevel']} → {school['RecommendedLevel']}
+                        </span>
+                    </div>
+                    <p><strong>BEMIS Code:</strong> {school['BemisCode']}</p>
+                    <p><strong>District:</strong> {school['District']}</p>
+                    <p><strong>Tehsil:</strong> {school['Tehsil']}</p>
+                    <p><strong>Gender:</strong> {school['Gender']}</p>
+                    <p><strong>Students:</strong> {school['TotalStudentProfileEntered']}</p>
+                    <p><strong>Building:</strong> {school['Building']}</p>
+                    <div style="background: #fff3cd; padding: 8px; border-radius: 5px; margin-top: 10px;">
+                        <strong>Reason:</strong> {school['UpgradeReason']}
+                    </div>
+                </div>
                 """
                 
-                # Use arrow-up icon for upgrade candidates to show they need upgrading
+                # Use a star icon for upgrade candidates with specific colors based on current level
                 folium.Marker(
-                    location=[school['_yCord'], school['_xCord']],
+                    location=[lat, lon],
                     popup=folium.Popup(popup_html, max_width=350),
-                    tooltip=f"🔼 UPGRADE: {school['SchoolName']} ({school['CurrentLevel']} → {school['RecommendedLevel']})",
-                    icon=folium.Icon(color=upgrade_color, icon='arrow-up', prefix='fa')
+                    tooltip=f"🌟 UPGRADE: {school['SchoolName']} ({school['CurrentLevel']} → {school['RecommendedLevel']})",
+                    icon=folium.Icon(
+                        color=upgrade_colors.get(school['CurrentLevel'], 'red'), 
+                        icon='star', 
+                        prefix='fa'
+                    )
                 ).add_to(m)
         
-        # Add legend
+        # Add enhanced legend positioned at center-left for better visibility
         legend_html = '''
         <div style="position: fixed; 
-                    bottom: 50px; left: 50px; width: 250px; height: 200px; 
-                    background-color: white; border:2px solid grey; z-index:9999; 
-                    font-size:12px; padding: 10px">
-        <p><b>School Levels & Upgrades</b></p>
-        <p><i class="fa fa-circle" style="color:blue"></i> Primary Schools</p>
-        <p><i class="fa fa-circle" style="color:green"></i> Middle Schools</p>
-        <p><i class="fa fa-circle" style="color:orange"></i> High Schools</p>
-        <p><i class="fa fa-circle" style="color:red"></i> Higher Secondary</p>
-        <hr>
-        <p><i class="fa fa-arrow-up" style="color:black"></i> <b>Upgrade Recommended</b></p>
+                    top: 50%; left: 20px; 
+                    transform: translateY(-50%);
+                    width: 300px; 
+                    background-color: rgba(255, 255, 255, 0.97); 
+                    border: 3px solid #2c3e50; 
+                    border-radius: 15px;
+                    z-index: 9999; 
+                    font-size: 14px; 
+                    font-family: 'Poppins', sans-serif;
+                    padding: 20px;
+                    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+                    backdrop-filter: blur(10px);">
+        <h4 style="color: #2c3e50; margin: 0 0 15px 0; text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 8px;">
+            <i class="fas fa-map-marked-alt"></i> Schools & Upgrades Legend
+        </h4>
+        <div style="margin-bottom: 20px;">
+            <h5 style="color: #34495e; margin: 0 0 10px 0; font-size: 16px;">School Levels:</h5>
+            <p style="margin: 5px 0; display: flex; align-items: center;"><i class="fa fa-circle" style="color: #3498db; margin-right: 8px;"></i> Primary Schools</p>
+            <p style="margin: 5px 0; display: flex; align-items: center;"><i class="fa fa-circle" style="color: #2ecc71; margin-right: 8px;"></i> Middle Schools</p>
+            <p style="margin: 5px 0; display: flex; align-items: center;"><i class="fa fa-circle" style="color: #f39c12; margin-right: 8px;"></i> High Schools</p>
+            <p style="margin: 5px 0; display: flex; align-items: center;"><i class="fa fa-circle" style="color: #e74c3c; margin-right: 8px;"></i> Higher Secondary</p>
+        </div>
+        <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); padding: 12px; border-radius: 8px; border: 2px solid #fdcb6e;">
+            <h5 style="color: #856404; margin: 0 0 8px 0; font-size: 16px;">
+                <i class="fa fa-star" style="color: #e74c3c; margin-right: 5px;"></i> Upgrade Recommended
+            </h5>
+            <p style="margin: 5px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-star" style="color: red; margin-right: 8px;"></i> Primary → Middle</p>
+            <p style="margin: 5px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-star" style="color: green; margin-right: 8px;"></i> Middle → High</p>
+            <p style="margin: 5px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-star" style="color: orange; margin-right: 8px;"></i> High → Higher Secondary</p>
+            <p style="margin: 0; font-size: 11px; color: #856404; font-weight: 500; margin-top: 8px;">
+                <strong>★ Star markers</strong> show schools recommended for upgrade
+            </p>
+        </div>
         </div>
         '''
         m.get_root().html.add_child(folium.Element(legend_html))
+        
+        # Add layer control for switching between map types
+        folium.LayerControl().add_to(m)
         
         return m
 
@@ -559,6 +649,7 @@ def upload_file():
 def analyze():
     try:
         radius = float(request.form.get('radius', 25))
+        min_enrollment = int(request.form.get('min_enrollment', 20))
         
         # Get selected districts
         selected_districts = request.form.getlist('districts')
@@ -589,6 +680,7 @@ def analyze():
         
         print(f"Analysis parameters:")
         print(f"- Radius: {radius}km")
+        print(f"- Min Enrollment: {min_enrollment} students")
         print(f"- Districts: {selected_districts}")
         print(f"- Genders: {selected_genders}")
         print(f"- Include Functional: {include_functional}")
@@ -598,6 +690,7 @@ def analyze():
         # Perform analysis
         upgrade_candidates = analyzer.analyze_upgrade_needs(
             radius_km=radius,
+            min_enrollment=min_enrollment,
             districts=selected_districts,
             genders=selected_genders,
             include_functional=include_functional,
@@ -609,31 +702,40 @@ def analyze():
             # Store upgrade candidates in analyzer for map creation
             analyzer.upgrade_candidates = upgrade_candidates
             
-            # Filter schools more precisely - only show upgrade candidates and nearby schools
+            # Filter schools to show only from selected districts
+            if selected_districts and len(selected_districts) > 0:
+                # Only show schools from selected districts
+                district_filtered_schools = analyzer.schools_df[analyzer.schools_df['District'].isin(selected_districts)].copy()
+            else:
+                # Show all schools if no specific district selected
+                district_filtered_schools = analyzer.schools_df.copy()
+            
             # Get BemisCodes of upgrade candidates
             upgrade_bemis_codes = set(upgrade_candidates['BemisCode'].unique())
             
             # Get districts and tehsils of upgrade candidates for context
             upgrade_locations = upgrade_candidates[['District', 'Tehsil']].drop_duplicates()
             
-            # Create filter for relevant schools:
-            # 1. All upgrade candidates
-            # 2. Schools in same tehsil as upgrade candidates (more specific than district)
-            is_upgrade_candidate = analyzer.schools_df['BemisCode'].isin(upgrade_bemis_codes)
+            # Create filter for relevant schools within selected districts:
+            # 1. All upgrade candidates (should already be in selected districts)
+            # 2. Schools in same tehsil as upgrade candidates
+            is_upgrade_candidate = district_filtered_schools['BemisCode'].isin(upgrade_bemis_codes)
             
-            # Create location filter for context schools
-            location_filter = pd.Series(False, index=analyzer.schools_df.index)
+            # Create location filter for context schools within selected districts
+            location_filter = pd.Series(False, index=district_filtered_schools.index)
             for _, loc in upgrade_locations.iterrows():
-                district_match = analyzer.schools_df['District'] == loc['District']
-                tehsil_match = analyzer.schools_df['Tehsil'] == loc['Tehsil']
+                district_match = district_filtered_schools['District'] == loc['District']
+                tehsil_match = district_filtered_schools['Tehsil'] == loc['Tehsil']
                 location_filter |= (district_match & tehsil_match)
             
-            # Combine filters: upgrade candidates OR schools in same tehsil
-            filtered_schools = analyzer.schools_df[is_upgrade_candidate | location_filter].copy()
+            # Combine filters: upgrade candidates OR schools in same tehsil (within selected districts)
+            filtered_schools = district_filtered_schools[is_upgrade_candidate | location_filter].copy()
             
             print(f"DEBUG: Total schools in database: {len(analyzer.schools_df)}")
+            print(f"DEBUG: Schools in selected districts: {len(district_filtered_schools)}")
             print(f"DEBUG: Upgrade candidates found: {len(upgrade_candidates)}")
             print(f"DEBUG: Filtered schools for map: {len(filtered_schools)}")
+            print(f"DEBUG: Selected districts: {selected_districts}")
             print(f"DEBUG: Upgrade districts/tehsils: {list(upgrade_locations.values) if not upgrade_locations.empty else 'None'}")
             
             # Limit to reasonable number for performance (max 500 schools on map)
@@ -892,4 +994,4 @@ def configure():
                          filename='Current Dataset')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5009, host='127.0.0.1')
+    app.run(debug=True, port=5010, host='127.0.0.1')

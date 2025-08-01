@@ -727,6 +727,32 @@
                                 </div>
                             </div>
 
+                            <!-- Minimum Enrollment -->
+                            <div class="config-section" data-aos="fade-up" data-aos-delay="900">
+                                <h6><i class="fas fa-users"></i>Minimum Enrollment Configuration</h6>
+                                <label class="form-label-elegant">
+                                    <i class="fas fa-user-graduate"></i>Minimum Student Enrollment for Analysis
+                                </label>
+                                <div class="range-container">
+                                    <input type="range" name="min_enrollment" id="enrollmentSlider" min="10" max="200" value="20" 
+                                           class="range-slider" oninput="updateEnrollmentDisplay(this.value)">
+                                    <div class="range-output" id="enrollmentOutput">
+                                        Minimum Enrollment: <strong>20 students</strong>
+                                    </div>
+                                </div>
+                                <div class="preset-buttons">
+                                    <button type="button" class="preset-btn" onclick="setEnrollment(10)">10</button>
+                                    <button type="button" class="preset-btn active" onclick="setEnrollment(20)">20</button>
+                                    <button type="button" class="preset-btn" onclick="setEnrollment(30)">30</button>
+                                    <button type="button" class="preset-btn" onclick="setEnrollment(50)">50</button>
+                                    <button type="button" class="preset-btn" onclick="setEnrollment(100)">100</button>
+                                </div>
+                                <div class="alert alert-info mt-2">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Schools with enrollment below this threshold will be excluded from analysis.
+                                </div>
+                            </div>
+
                             <!-- Search Radius -->
                             <div class="config-section" data-aos="fade-up" data-aos-delay="1000">
                                 <h6><i class="fas fa-circle-notch"></i>Search Radius Configuration</h6>
@@ -876,6 +902,15 @@
             });
         }
 
+        function updateEnrollmentDisplay(value) {
+            document.getElementById('enrollmentOutput').innerHTML = `Minimum Enrollment: <strong>${value} students</strong>`;
+            
+            // Update preset button states for enrollment
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+
         function setRadius(value) {
             document.getElementById('radiusSlider').value = value;
             updateRadiusDisplay(value);
@@ -884,6 +919,21 @@
             document.querySelectorAll('.preset-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.textContent.includes(value + ' km')) {
+                    btn.classList.add('active');
+                }
+            });
+
+            updatePreview();
+        }
+
+        function setEnrollment(value) {
+            document.getElementById('enrollmentSlider').value = value;
+            updateEnrollmentDisplay(value);
+            
+            // Update preset button states for enrollment
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent == value) {
                     btn.classList.add('active');
                 }
             });
