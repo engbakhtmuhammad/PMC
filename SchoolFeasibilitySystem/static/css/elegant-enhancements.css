@@ -1,0 +1,206 @@
+/* Additional elegant enhancements for the School Feasibility System */
+
+/* Custom Loading Animation */
+@keyframes elegantPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+.elegant-loading {
+    animation: elegantPulse 2s ease-in-out infinite;
+}
+
+/* Enhanced Tooltips */
+.elegant-tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.elegant-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+}
+
+.elegant-tooltip:hover::after {
+    opacity: 1;
+}
+
+/* Success Notifications */
+.success-notification {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(5, 150, 105, 0.3);
+    transform: translateX(400px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9999;
+}
+
+.success-notification.show {
+    transform: translateX(0);
+}
+
+/* Enhanced Focus States */
+.form-control-elegant:focus,
+.btn-elegant:focus {
+    outline: 2px solid rgba(37, 99, 235, 0.3);
+    outline-offset: 2px;
+}
+
+/* Coordinate Input Enhancements */
+.coordinate-input-group {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(37, 99, 235, 0.1);
+    border-radius: var(--radius-xl);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.coordinate-input-group:hover {
+    border-color: rgba(37, 99, 235, 0.3);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.coordinate-input-group.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Map Container Enhancements */
+.map-container-elegant {
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-2xl);
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    background: var(--white);
+    position: relative;
+}
+
+.map-container-elegant::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Enhanced Analysis Results */
+.analysis-results-card {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.feasibility-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.feasibility-indicator.feasible {
+    background: var(--gradient-success);
+    color: white;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.feasibility-indicator.not-feasible {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.feasibility-indicator.warning {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+}
+
+/* Print Styles Enhancement */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    .card-elegant {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+    }
+    
+    .analysis-results-card {
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+    
+    .map-container-elegant {
+        border: 2px solid #333 !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Dark Mode Support (for future enhancement) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary-color: #3b82f6;
+        --secondary-color: #06b6d4;
+        --dark-color: #f9fafb;
+        --light-bg: #1f2937;
+        --white: #111827;
+    }
+}
+
+/* Mobile Responsiveness Enhancements */
+@media (max-width: 768px) {
+    .coordinate-input-group {
+        padding: 1rem;
+    }
+    
+    .analysis-results-card {
+        margin-bottom: 1rem;
+    }
+    
+    .feasibility-indicator {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+}

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Balochistan School Feasibility System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/elegant-enhancements.css') }}">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #0891b2;
+            --accent-color: #dc2626;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --info-color: #0284c7;
+            --dark-color: #1f2937;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+            --gradient-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            --gradient-info: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-3xl: 2rem;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gradient-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="white" stop-opacity="0.08"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient></defs><circle cx="200" cy="200" r="80" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;700,600;0,0" dur="22s" repeatCount="indefinite"/></circle><circle cx="800" cy="300" r="60" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;-600,500;0,0" dur="18s" repeatCount="indefinite"/></circle><circle cx="400" cy="800" r="70" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;500,-300;0,0" dur="28s" repeatCount="indefinite"/></circle></svg>') center/cover;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Main Container */
+        .main-container {
+            padding: 1.5rem 0;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-2xl);
+            padding: 1rem 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        /* Card Styles */
+        .card-elegant {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-elegant:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .card-header-elegant {
+            background: var(--gradient-secondary);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header-elegant::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .card-header-elegant h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header-elegant p {
+            font-size: 1rem;
+            margin: 0.5rem 0 0 0;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+        }
+
+        .card-body-elegant {
+            padding: 2rem;
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-secondary);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stats-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stats-card-icon {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stats-card-icon.success {
+            background: var(--gradient-success);
+        }
+
+        .stats-card-icon.warning {
+            background: var(--gradient-warning);
+        }
+
+        .stats-card-icon.danger {
+            background: var(--gradient-danger);
+        }
+
+        .stats-card-icon.info {
+            background: var(--gradient-info);
+        }
+
+        .stats-card h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            color: var(--gray-800);
+        }
+
+        .stats-card p {
+            font-size: 0.875rem;
+            margin: 0.5rem 0 0 0;
+            color: var(--gray-600);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Map Container */
+        .map-container {
+            height: 600px;
+            border-radius: var(--radius-2xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            background: var(--white);
+            position: relative;
+        }
+
+        .map-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.1) 50%, transparent 52%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            border-radius: var(--radius-2xl);
+        }
+
+        /* Results Table */
+        .results-table {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-200);
+        }
+
+        .table-responsive {
+            border-radius: var(--radius-xl);
+        }
+
+        .table-elegant {
+            margin: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table-elegant thead th {
+            background: var(--gradient-secondary);
+            color: white;
+            font-weight: 700;
+            padding: 1.25rem;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.875rem;
+        }
+
+        .table-elegant tbody td {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+            font-weight: 500;
+            vertical-align: middle;
+        }
+
+        .table-elegant tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        .table-elegant tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Button Styles */
+        .btn-elegant {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-elegant::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-elegant:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary-elegant {
+            background: var(--gradient-secondary);
+            color: white;
+        }
+
+        .btn-primary-elegant:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+            color: white;
+        }
+
+        .btn-success-elegant {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-success-elegant:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+            color: white;
+        }
+
+        .btn-secondary-elegant {
+            background: var(--gray-600);
+            color: white;
+        }
+
+        .btn-secondary-elegant:hover {
+            background: var(--gray-700);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+            color: white;
+        }
+
+        .btn-download {
+            background: var(--gradient-info);
+            color: white;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+            color: white;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            width: 3rem;
+            height: 2px;
+            background: var(--success-color);
+            margin: 0 1rem;
+        }
+
+        .step-circle {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: var(--success-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            transform: scale(1.1);
+        }
+
+        /* Legend */
+        .map-legend {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            border: 1px solid var(--gray-200);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-color {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem 0;
+            }
+            
+            .card-body-elegant {
+                padding: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .map-container {
+                height: 400px;
+            }
+            
+            .progress-steps {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .step:not(:last-child)::after {
+                width: 2px;
+                height: 2rem;
+                margin: 0.5rem 0;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="container">
+        <div class="nav-bar" data-aos="fade-down">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <i class="fas fa-chart-line text-primary fs-4"></i>
+                    <h5 class="mb-0 fw-bold">Feasibility Analysis Results</h5>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('configure') }}" class="btn btn-secondary-elegant btn-sm">
+                        <i class="fas fa-arrow-left me-2"></i>Back
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-home me-2"></i>New Analysis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container main-container">
+        <!-- Progress Steps -->
+        <div class="progress-steps" data-aos="fade-up">
+            <div class="step">
+                <div class="step-circle">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-circle">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="100">
+            <div class="card-header-elegant">
+                <h2><i class="fas fa-chart-bar me-3"></i>Feasibility Analysis Summary</h2>
+                <p>{{ school_level }} School - Minimum Distance: {{ min_distance }}km</p>
+            </div>
+            <div class="card-body-elegant">
+                <div class="stats-grid">
+                    <div class="stats-card" data-aos="zoom-in" data-aos-delay="200">
+                        <div class="stats-card-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>{{ feasible_count }}</h3>
+                        <p>Feasible Locations</p>
+                    </div>
+                    <div class="stats-card" data-aos="zoom-in" data-aos-delay="300">
+                        <div class="stats-card-icon danger">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <h3>{{ not_feasible_count }}</h3>
+                        <p>Not Feasible</p>
+                    </div>
+                    <div class="stats-card" data-aos="zoom-in" data-aos-delay="400">
+                        <div class="stats-card-icon info">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3>{{ total_proposed }}</h3>
+                        <p>Total Proposed</p>
+                    </div>
+                    <div class="stats-card" data-aos="zoom-in" data-aos-delay="500">
+                        <div class="stats-card-icon warning">
+                            <i class="fas fa-school"></i>
+                        </div>
+                        <h3>{{ total_existing }}</h3>
+                        <p>Existing Schools</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Map -->
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="200">
+            <div class="card-header-elegant">
+                <h2><i class="fas fa-map me-3"></i>Interactive Feasibility Map</h2>
+                <p>Visual representation of proposed locations and existing schools</p>
+            </div>
+            <div class="card-body-elegant p-0">
+                <div class="map-container-elegant position-relative">
+                    <div id="map" class="map-container"></div>
+                    <div class="map-legend">
+                        <h6 class="fw-bold mb-2">Legend</h6>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #059669;"></div>
+                            <span>Feasible Location</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #dc2626;"></div>
+                            <span>Not Feasible</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background-color: #2563eb;"></div>
+                            <span>Existing {{ school_level }} School</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Results -->
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="300">
+            <div class="card-header-elegant">
+                <h2><i class="fas fa-list-alt me-3"></i>Detailed Analysis Results</h2>
+                <p>Complete breakdown of each proposed location</p>
+            </div>
+            <div class="card-body-elegant">
+                <div class="results-table">
+                    <div class="table-responsive">
+                        <table class="table table-elegant">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-hashtag me-2"></i>Location</th>
+                                    <th><i class="fas fa-map-pin me-2"></i>Coordinates</th>
+                                    <th><i class="fas fa-check-circle me-2"></i>Feasibility</th>
+                                    <th><i class="fas fa-ruler me-2"></i>Nearest School</th>
+                                    <th><i class="fas fa-road me-2"></i>Distance (km)</th>
+                                    <th><i class="fas fa-lightbulb me-2"></i>Recommendation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                <tr>
+                                    <td class="fw-bold">
+                                        {{ result.location_name or 'Proposed Site ' + loop.index|string }}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ "%.6f"|format(result.latitude) }}, {{ "%.6f"|format(result.longitude) }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        {% if result.feasible %}
+                                            <span class="feasibility-indicator feasible">
+                                                <i class="fas fa-check"></i>
+                                                Feasible
+                                            </span>
+                                        {% else %}
+                                            <span class="feasibility-indicator not-feasible">
+                                                <i class="fas fa-times"></i>
+                                                Not Feasible
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if result.nearest_school %}
+                                            {{ result.nearest_school.get('School_Name', 'Unknown School') }}
+                                            <br><small class="text-muted">{{ result.nearest_school.get('Level', 'Unknown Level') }}</small>
+                                        {% else %}
+                                            <span class="text-muted">No nearby schools</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if result.distance_to_nearest %}
+                                            <span class="fw-bold {% if result.distance_to_nearest < min_distance %}text-danger{% else %}text-success{% endif %}">
+                                                {{ "%.2f"|format(result.distance_to_nearest) }} km
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if result.feasible %}
+                                            <span class="text-success fw-bold">
+                                                <i class="fas fa-thumbs-up me-1"></i>
+                                                Recommended
+                                            </span>
+                                        {% else %}
+                                            <span class="text-danger fw-bold">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                                Too close to existing school
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center" data-aos="fade-up" data-aos-delay="400">
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="{{ url_for('download_results') }}" class="btn btn-download btn-elegant">
+                    <i class="fas fa-download me-2"></i>Download Report
+                </a>
+                <a href="{{ url_for('configure') }}" class="btn btn-secondary-elegant">
+                    <i class="fas fa-edit me-2"></i>Modify Analysis
+                </a>
+                <a href="{{ url_for('index') }}" class="btn btn-primary-elegant">
+                    <i class="fas fa-plus me-2"></i>New Analysis
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Notification Template -->
+    <div id="successNotification" class="success-notification">
+        <i class="fas fa-check-circle me-2"></i>
+        <span id="successMessage"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 100
+        });
+
+        // Initialize map
+        var map = L.map('map').setView([{{ center_lat }}, {{ center_lng }}], 10);
+
+        // Add tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Custom icons
+        var feasibleIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: '<div style="background-color: #059669; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>',
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+
+        var notFeasibleIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: '<div style="background-color: #dc2626; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>',
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+
+        var existingIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: '<div style="background-color: #2563eb; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+        });
+
+        // Add proposed locations
+        {% for result in results %}
+        var marker = L.marker([{{ result.latitude }}, {{ result.longitude }}], {
+            icon: {% if result.feasible %}feasibleIcon{% else %}notFeasibleIcon{% endif %}
+        }).addTo(map);
+        
+        marker.bindPopup(`
+            <div style="min-width: 200px;">
+                <h6 style="margin-bottom: 10px; color: #1f2937; font-weight: bold;">
+                    {{ result.location_name or 'Proposed Site ' + loop.index|string }}
+                </h6>
+                <p style="margin: 5px 0; font-size: 14px;">
+                    <strong>Status:</strong> 
+                    <span style="color: {% if result.feasible %}#059669{% else %}#dc2626{% endif %};">
+                        {% if result.feasible %}✓ Feasible{% else %}✗ Not Feasible{% endif %}
+                    </span>
+                </p>
+                <p style="margin: 5px 0; font-size: 14px;">
+                    <strong>Coordinates:</strong> {{ "%.6f"|format(result.latitude) }}, {{ "%.6f"|format(result.longitude) }}
+                </p>
+                {% if result.nearest_school %}
+                <p style="margin: 5px 0; font-size: 14px;">
+                    <strong>Nearest School:</strong> {{ result.nearest_school.get('School_Name', 'Unknown') }}
+                </p>
+                <p style="margin: 5px 0; font-size: 14px;">
+                    <strong>Distance:</strong> {{ "%.2f"|format(result.distance_to_nearest) }} km
+                </p>
+                {% endif %}
+            </div>
+        `);
+        {% endfor %}
+
+        // Add existing schools
+        {% for school in existing_schools %}
+        {% if school.get('Latitude') and school.get('Longitude') %}
+        var existingMarker = L.marker([{{ school.Latitude }}, {{ school.Longitude }}], {
+            icon: existingIcon
+        }).addTo(map);
+        
+        existingMarker.bindPopup(`
+            <div style="min-width: 200px;">
+                <h6 style="margin-bottom: 10px; color: #1f2937; font-weight: bold;">
+                    {{ school.get('School_Name', 'Unknown School') }}
+                </h6>
+                <p style="margin: 5px 0; font-size: 14px;">
+                    <strong>Level:</strong> {{ school.get('Level', 'Unknown') }}
+                </p>
+                <p style="margin: 5px 0; font-size: 14px;">
+                    <strong>Type:</strong> Existing School
+                </p>
+                <p style="margin: 5px 0; font-size: 14px;">
+                    <strong>Coordinates:</strong> {{ "%.6f"|format(school.Latitude) }}, {{ "%.6f"|format(school.Longitude) }}
+                </p>
+            </div>
+        `);
+        {% endif %}
+        {% endfor %}
+
+        // Fit map to show all markers
+        var group = new L.featureGroup();
+        map.eachLayer(function(layer) {
+            if (layer instanceof L.Marker) {
+                group.addLayer(layer);
+            }
+        });
+        
+        if (group.getLayers().length > 0) {
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
+
+        // Success notification function
+        function showSuccessNotification(message) {
+            const notification = document.getElementById('successNotification');
+            const messageElement = document.getElementById('successMessage');
+            messageElement.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Add download button functionality
+        document.querySelector('.btn-download').addEventListener('click', function() {
+            showSuccessNotification('Downloading feasibility analysis report...');
+        });
+
+        // Add map controls
+        map.addControl(new L.Control.Fullscreen());
+    </script>
+</body>
+</html>

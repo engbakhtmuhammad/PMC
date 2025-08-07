@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balochistan School Feasibility Analysis System | Government of Balochistan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/elegant-enhancements.css') }}">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #0891b2;
+            --accent-color: #dc2626;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --info-color: #0284c7;
+            --dark-color: #1f2937;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+            --gradient-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            --gradient-info: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-3xl: 2rem;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gradient-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="white" stop-opacity="0.1"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="100" r="50" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;900,900;0,0" dur="20s" repeatCount="indefinite"/></circle><circle cx="800" cy="200" r="30" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;-700,700;0,0" dur="15s" repeatCount="indefinite"/></circle><circle cx="400" cy="800" r="40" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;500,-500;0,0" dur="25s" repeatCount="indefinite"/></circle></svg>') center/cover;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Government Header */
+        .gov-header {
+            background: var(--gradient-secondary);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow-2xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gov-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="2" height="2" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            animation: shimmer 8s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        .gov-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .gov-subtitle {
+            font-size: 1.125rem;
+            margin: 0.5rem 0 0 0;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Main Container */
+        .main-container {
+            padding: 3rem 0;
+        }
+
+        /* Card Styles */
+        .card-elegant {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-3xl);
+            box-shadow: var(--shadow-2xl);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-elegant:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .card-header-elegant {
+            background: var(--gradient-secondary);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header-elegant::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .card-header-elegant h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header-elegant p {
+            font-size: 1.25rem;
+            margin: 1rem 0 0 0;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-body-elegant {
+            padding: 3rem 2rem;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: linear-gradient(135deg, var(--gray-50) 0%, rgba(248, 250, 252, 0.8) 100%);
+            border: 3px dashed var(--gray-300);
+            border-radius: var(--radius-2xl);
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-section:hover {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.1) 100%);
+            transform: translateY(-2px);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .upload-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+        }
+
+        .upload-subtitle {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+        }
+
+        /* Button Styles */
+        .btn-elegant {
+            padding: 1rem 2rem;
+            font-weight: 600;
+            border-radius: var(--radius-xl);
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-elegant::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-elegant:hover::before {
+            left: 100%;
+        }
+
+        .btn-elegant:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-primary-elegant {
+            background: var(--gradient-secondary);
+            color: white;
+        }
+
+        .btn-primary-elegant:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #0c7490 100%);
+            color: white;
+        }
+
+        .btn-success-elegant {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-success-elegant:hover {
+            background: linear-gradient(135deg, #047857 0%, #059669 100%);
+            color: white;
+        }
+
+        /* Divider */
+        .divider-elegant {
+            position: relative;
+            text-align: center;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .divider-elegant::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--gray-300), transparent);
+        }
+
+        .divider-elegant span {
+            background: white;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Alert Styles */
+        .alert-elegant {
+            border-radius: var(--radius-xl);
+            border: none;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-md);
+        }
+
+        .alert-success-elegant {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-danger-elegant {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: var(--radius-2xl);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-info);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: var(--gray-600);
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        /* File Info */
+        .file-info {
+            background: var(--gradient-info);
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-xl);
+            margin-top: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Validation Result */
+        .validation-result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: var(--radius-xl);
+            display: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        .validation-success {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .validation-error {
+            background: linear-gradient(135deg, #fca5a5 0%, #f87171 100%);
+            color: white;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            backdrop-filter: blur(8px);
+        }
+
+        .loading-content {
+            background: white;
+            padding: 3rem;
+            border-radius: var(--radius-2xl);
+            text-align: center;
+            box-shadow: var(--shadow-2xl);
+            max-width: 400px;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Required Columns Section */
+        .columns-section {
+            background: linear-gradient(135deg, var(--gray-50) 0%, rgba(248, 250, 252, 0.8) 100%);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin-top: 3rem;
+            border: 1px solid var(--gray-200);
+        }
+
+        .column-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .column-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s ease;
+        }
+
+        .column-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .column-item i {
+            color: var(--success-color);
+            margin-right: 0.75rem;
+        }
+
+        .column-item code {
+            background: var(--gray-100);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            color: var(--gray-700);
+        }
+
+        /* Instructions Section */
+        .instructions-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(8, 145, 178, 0.05) 100%);
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .instruction-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .instruction-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .instruction-number {
+            background: var(--gradient-primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .instruction-content h6 {
+            color: var(--gray-800);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .instruction-content p {
+            color: var(--gray-600);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1.5rem 0;
+            }
+
+            .card-header-elegant {
+                padding: 2rem 1.5rem;
+            }
+
+            .card-header-elegant h2 {
+                font-size: 2rem;
+            }
+
+            .card-body-elegant {
+                padding: 2rem 1.5rem;
+            }
+
+            .upload-section {
+                padding: 2rem 1rem;
+            }
+
+            .upload-icon {
+                font-size: 3rem;
+            }
+
+            .upload-title {
+                font-size: 1.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .column-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Government Header -->
+    <header class="gov-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="gov-title">
+                        <i class="fas fa-map-marked-alt me-3"></i>
+                        School Feasibility Analysis System
+                    </h1>
+                    <p class="gov-subtitle">Government of Balochistan - Education Department</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <img src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='white' opacity='0.2'/><text x='50' y='55' text-anchor='middle' fill='white' font-size='12' font-weight='bold'>GOB</text></svg>" alt="Government Logo" style="opacity: 0.8;">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container main-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card-elegant" data-aos="fade-up" data-aos-duration="1000">
+                    <div class="card-header-elegant">
+                        <h2>
+                            <i class="fas fa-search-location me-3"></i>
+                            School Location Feasibility Analysis
+                        </h2>
+                        <p>Analyze the feasibility of proposed school locations based on existing infrastructure</p>
+                    </div>
+                    <div class="card-body-elegant">
+                        <!-- Flash Messages -->
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert-elegant alert-{{ 'danger' if category == 'error' else category }}-elegant" data-aos="fade-in">
+                                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' }} me-2"></i>
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <!-- File Upload Form -->
+                        <form action="/upload" method="post" enctype="multipart/form-data" id="uploadForm">
+                            <div class="upload-section" id="uploadArea" data-aos="zoom-in" data-aos-delay="400">
+                                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                <h3 class="upload-title">Upload Existing School Data</h3>
+                                <p class="upload-subtitle">
+                                    Upload CSV file containing existing school data to analyze feasibility of new locations
+                                </p>
+                                <input type="file" class="form-control" name="file" accept=".csv,.xlsx,.xls" required id="fileInput" style="display: none;">
+                                <button type="button" class="btn btn-primary-elegant btn-elegant me-3" onclick="document.getElementById('fileInput').click()">
+                                    <i class="fas fa-folder-open me-2"></i>Choose File
+                                </button>
+                                <div class="divider-elegant my-4">
+                                    <span>or</span>
+                                </div>
+                                <a href="/load-sample" class="btn btn-success-elegant btn-elegant">
+                                    <i class="fas fa-database me-2"></i>Load Sample Data
+                                </a>
+                            </div>
+
+                            <!-- File Information -->
+                            <div id="fileInfo" class="file-info" style="display: none;" data-aos="fade-up">
+                                <h6><i class="fas fa-file-csv me-2"></i>Selected File</h6>
+                                <p id="fileName" class="mb-2"></p>
+                                <p id="fileSize" class="mb-0"></p>
+                            </div>
+
+                            <!-- Validation Result -->
+                            <div id="validationResult" class="validation-result">
+                                <div id="validationContent"></div>
+                                <div class="loading-spinner text-center">
+                                    <div class="spinner"></div>
+                                    <p class="mb-0 fw-semibold">Validating file format...</p>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="600">
+                                <button type="submit" class="btn btn-primary-elegant btn-elegant btn-lg" id="submitBtn" disabled>
+                                    <i class="fas fa-upload me-2"></i>
+                                    <span id="btnText">Upload & Validate</span>
+                                    <span id="btnSpinner" class="spinner-border spinner-border-sm ms-2" style="display: none;"></span>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Features Grid -->
+                        <div class="features-grid" data-aos="fade-up" data-aos-delay="800">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-map-pin"></i>
+                                </div>
+                                <h4 class="feature-title">Location Analysis</h4>
+                                <p class="feature-description">Analyze proposed school coordinates against existing infrastructure to determine optimal placement.</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-calculator"></i>
+                                </div>
+                                <h4 class="feature-title">Distance Calculations</h4>
+                                <p class="feature-description">Calculate minimum required distances between schools of different levels for efficient resource allocation.</p>
+                            </div>
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                                <h4 class="feature-title">Feasibility Reports</h4>
+                                <p class="feature-description">Generate comprehensive feasibility reports with recommendations for each proposed location.</p>
+                            </div>
+                        </div>
+
+                        <!-- Required Columns Information -->
+                        <div class="columns-section" data-aos="fade-up" data-aos-delay="1000">
+                            <h5><i class="fas fa-list-check me-2"></i>Required CSV Columns</h5>
+                            <p class="text-muted mb-3">Your CSV file must contain the following columns for proper analysis:</p>
+                            <div class="column-list">
+                                {% for column in required_columns %}
+                                <div class="column-item">
+                                    <i class="fas fa-check-circle"></i>
+                                    <code>{{ column }}</code>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Instructions -->
+                        <div class="instructions-section" data-aos="fade-up" data-aos-delay="1200">
+                            <h5><i class="fas fa-info-circle me-2"></i>How to Use This System</h5>
+                            <div class="instruction-item">
+                                <div class="instruction-number">1</div>
+                                <div class="instruction-content">
+                                    <h6>Upload School Data</h6>
+                                    <p>Upload a CSV file containing existing school information including coordinates, levels, and other details.</p>
+                                </div>
+                            </div>
+                            <div class="instruction-item">
+                                <div class="instruction-number">2</div>
+                                <div class="instruction-content">
+                                    <h6>Configure Analysis Parameters</h6>
+                                    <p>Set search radius, minimum distances, and other criteria for feasibility analysis.</p>
+                                </div>
+                            </div>
+                            <div class="instruction-item">
+                                <div class="instruction-number">3</div>
+                                <div class="instruction-content">
+                                    <h6>Add Proposed Locations</h6>
+                                    <p>Input coordinates of proposed school locations with their intended levels and other details.</p>
+                                </div>
+                            </div>
+                            <div class="instruction-item">
+                                <div class="instruction-number">4</div>
+                                <div class="instruction-content">
+                                    <h6>Review Results</h6>
+                                    <p>Get detailed feasibility analysis, interactive maps, and recommendations for each proposed location.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h5 class="mb-2">Processing...</h5>
+            <p class="text-muted mb-0">Please wait while we validate your file</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 50
+        });
+
+        // File input handling
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const submitBtn = document.getElementById('submitBtn');
+        const uploadArea = document.getElementById('uploadArea');
+
+        // Make upload area clickable
+        uploadArea.addEventListener('click', function(e) {
+            if (e.target.type !== 'file' && !e.target.closest('button')) {
+                fileInput.click();
+            }
+        });
+
+        // Handle file selection
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                fileName.textContent = file.name;
+                fileSize.textContent = `Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`;
+                fileInfo.style.display = 'block';
+                submitBtn.disabled = false;
+                
+                // Add visual feedback
+                uploadArea.style.borderColor = 'var(--success-color)';
+                uploadArea.style.background = 'linear-gradient(135deg, rgba(5, 150, 105, 0.05) 0%, rgba(5, 150, 105, 0.1) 100%)';
+            }
+        });
+
+        // Handle drag and drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--primary-color)';
+            uploadArea.style.background = 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.15) 100%)';
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--gray-300)';
+            uploadArea.style.background = 'linear-gradient(135deg, var(--gray-50) 0%, rgba(248, 250, 252, 0.8) 100%)';
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Form submission
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            if (submitBtn.disabled) {
+                e.preventDefault();
+                return;
+            }
+            
+            // Show loading state
+            document.getElementById('btnText').textContent = 'Uploading...';
+            document.getElementById('btnSpinner').style.display = 'inline-block';
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            submitBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>

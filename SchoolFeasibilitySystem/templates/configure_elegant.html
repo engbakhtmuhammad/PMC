@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configure Analysis - Balochistan School Feasibility System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/elegant-enhancements.css') }}">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #0891b2;
+            --accent-color: #dc2626;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --info-color: #0284c7;
+            --dark-color: #1f2937;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+            --gradient-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            --gradient-info: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-3xl: 2rem;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gradient-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="white" stop-opacity="0.1"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="60" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;800,800;0,0" dur="25s" repeatCount="indefinite"/></circle><circle cx="850" cy="250" r="40" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;-700,600;0,0" dur="20s" repeatCount="indefinite"/></circle><circle cx="300" cy="750" r="50" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;600,-400;0,0" dur="30s" repeatCount="indefinite"/></circle></svg>') center/cover;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Main Container */
+        .main-container {
+            padding: 2rem 0;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-2xl);
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        /* Card Styles */
+        .card-elegant {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-3xl);
+            box-shadow: var(--shadow-2xl);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-elegant:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .card-header-elegant {
+            background: var(--gradient-secondary);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header-elegant::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: rotate 8s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .card-header-elegant h2 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header-elegant p {
+            font-size: 1.125rem;
+            margin: 0.75rem 0 0 0;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+        }
+
+        .card-body-elegant {
+            padding: 2.5rem;
+        }
+
+        /* Data Summary Section */
+        .data-summary {
+            background: var(--gradient-info);
+            color: white;
+            border-radius: var(--radius-2xl);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .data-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+        }
+
+        .data-summary h5 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-item {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Form Styles */
+        .form-group-elegant {
+            margin-bottom: 2rem;
+        }
+
+        .form-label-elegant {
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 0.75rem;
+            font-size: 1.125rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-control-elegant {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-control-elegant:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+        .form-select-elegant {
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+        }
+
+        .form-select-elegant:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+        /* Button Styles */
+        .btn-elegant {
+            padding: 1rem 2rem;
+            border-radius: var(--radius-xl);
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-elegant::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-elegant:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary-elegant {
+            background: var(--gradient-secondary);
+            color: white;
+        }
+
+        .btn-primary-elegant:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+            color: white;
+        }
+
+        .btn-success-elegant {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-success-elegant:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+            color: white;
+        }
+
+        .btn-secondary-elegant {
+            background: var(--gray-600);
+            color: white;
+        }
+
+        .btn-secondary-elegant:hover {
+            background: var(--gray-700);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+            color: white;
+        }
+
+        /* Coordinate Input Section */
+        .coordinate-section {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: var(--radius-2xl);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid rgba(37, 99, 235, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .coordinate-section:hover {
+            border-color: rgba(37, 99, 235, 0.3);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .coordinate-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .add-coordinate-btn {
+            background: var(--gradient-info);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-coordinate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .remove-coordinate-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 0.5rem;
+            transition: all 0.3s ease;
+            margin-left: 0.5rem;
+        }
+
+        .remove-coordinate-btn:hover {
+            background: #b91c1c;
+            transform: scale(1.1);
+        }
+
+        /* Alert Styles */
+        .alert-elegant {
+            border: none;
+            border-radius: var(--radius-xl);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .alert-info-elegant {
+            background: rgba(2, 132, 199, 0.1);
+            color: var(--info-color);
+            border-left: 4px solid var(--info-color);
+        }
+
+        .alert-warning-elegant {
+            background: rgba(217, 119, 6, 0.1);
+            color: var(--warning-color);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .step:not(:last-child)::after {
+            content: '';
+            width: 3rem;
+            height: 2px;
+            background: var(--gray-300);
+            margin: 0 1rem;
+        }
+
+        .step.active:not(:last-child)::after {
+            background: var(--primary-color);
+        }
+
+        .step-circle {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: var(--gray-300);
+            color: var(--gray-600);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-circle {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step.completed .step-circle {
+            background: var(--success-color);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .coordinate-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-body-elegant {
+                padding: 1.5rem;
+            }
+            
+            .data-summary {
+                padding: 1.5rem;
+            }
+            
+            .progress-steps {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .step:not(:last-child)::after {
+                width: 2px;
+                height: 2rem;
+                margin: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="container">
+        <div class="nav-bar" data-aos="fade-down">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <i class="fas fa-map-marker-alt text-primary fs-4"></i>
+                    <h5 class="mb-0 fw-bold">School Feasibility Analysis</h5>
+                </div>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Upload
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container main-container">
+        <!-- Progress Steps -->
+        <div class="progress-steps" data-aos="fade-up">
+            <div class="step completed">
+                <div class="step-circle">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+            <div class="step active">
+                <div class="step-circle">2</div>
+            </div>
+            <div class="step">
+                <div class="step-circle">3</div>
+            </div>
+        </div>
+
+        <!-- Data Summary Card -->
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="100">
+            <div class="data-summary">
+                <h5><i class="fas fa-database me-2"></i>Uploaded School Data Summary</h5>
+                <div class="summary-item">
+                    <span><i class="fas fa-school me-2"></i>Total Schools:</span>
+                    <span class="fw-bold">{{ total_schools }}</span>
+                </div>
+                <div class="summary-item">
+                    <span><i class="fas fa-map-pin me-2"></i>Valid Coordinates:</span>
+                    <span class="fw-bold">{{ valid_coordinates }}</span>
+                </div>
+                <div class="summary-item">
+                    <span><i class="fas fa-graduation-cap me-2"></i>School Levels:</span>
+                    <span class="fw-bold">{{ school_levels | join(', ') }}</span>
+                </div>
+                <div class="summary-item">
+                    <span><i class="fas fa-file me-2"></i>Filename:</span>
+                    <span class="fw-bold">{{ filename }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Form -->
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="200">
+            <div class="card-header-elegant">
+                <h2><i class="fas fa-cogs me-3"></i>Configure Feasibility Analysis</h2>
+                <p>Enter proposed school coordinates and configure analysis parameters</p>
+            </div>
+            <div class="card-body-elegant">
+                <form method="POST" action="{{ url_for('analyze') }}" id="analysisForm">
+                    <input type="hidden" name="filename" value="{{ filename }}">
+                    
+                    <!-- School Level Selection -->
+                    <div class="form-group-elegant">
+                        <label class="form-label-elegant">
+                            <i class="fas fa-graduation-cap text-primary"></i>
+                            Proposed School Level
+                        </label>
+                        <select name="school_level" class="form-select-elegant" required>
+                            <option value="">Select school level...</option>
+                            <option value="Primary">Primary School</option>
+                            <option value="Middle">Middle School</option>
+                            <option value="High">High School</option>
+                            <option value="Higher Secondary">Higher Secondary School</option>
+                        </select>
+                        <div class="form-text mt-2">
+                            <i class="fas fa-info-circle text-info"></i>
+                            The system will check feasibility based on proximity to existing schools of the same level.
+                        </div>
+                    </div>
+
+                    <!-- Minimum Distance Configuration -->
+                    <div class="form-group-elegant">
+                        <label class="form-label-elegant">
+                            <i class="fas fa-ruler text-primary"></i>
+                            Minimum Distance (kilometers)
+                        </label>
+                        <input type="number" name="min_distance" value="2" step="0.1" min="0.1" max="10" 
+                               class="form-control-elegant" required>
+                        <div class="form-text mt-2">
+                            <i class="fas fa-info-circle text-info"></i>
+                            Minimum distance required between schools of the same level (default: 2 km).
+                        </div>
+                    </div>
+
+                    <!-- Coordinate Input Section -->
+                    <div class="coordinate-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                Proposed School Locations
+                            </h5>
+                            <button type="button" class="add-coordinate-btn" onclick="addCoordinateInput()">
+                                <i class="fas fa-plus"></i>
+                                Add Location
+                            </button>
+                        </div>
+                        
+                        <div id="coordinateInputs">
+                            <div class="coordinate-input-group" data-index="0">
+                                <div class="coordinate-inputs">
+                                    <div>
+                                        <label class="form-label-elegant">
+                                            <i class="fas fa-compass text-primary"></i>
+                                            Latitude
+                                        </label>
+                                        <input type="number" name="latitudes[]" step="any" 
+                                               class="form-control-elegant" placeholder="e.g., 30.1975" required>
+                                    </div>
+                                    <div>
+                                        <label class="form-label-elegant">
+                                            <i class="fas fa-compass text-primary"></i>
+                                            Longitude
+                                        </label>
+                                        <input type="number" name="longitudes[]" step="any" 
+                                               class="form-control-elegant" placeholder="e.g., 66.9995" required>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="form-label-elegant">
+                                        <i class="fas fa-tag text-primary"></i>
+                                        Location Name (Optional)
+                                    </label>
+                                    <div class="d-flex align-items-center">
+                                        <input type="text" name="location_names[]" 
+                                               class="form-control-elegant" placeholder="e.g., Proposed Site 1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info-elegant">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Pro Tip:</strong> You can add multiple proposed locations to analyze them all at once. 
+                            The system will evaluate each location independently for feasibility.
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary-elegant">
+                            <i class="fas fa-arrow-left me-2"></i>Back
+                        </a>
+                        <button type="submit" class="btn btn-primary-elegant" id="analyzeBtn">
+                            <i class="fas fa-search me-2"></i>Analyze Feasibility
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Notification Template -->
+    <div id="successNotification" class="success-notification">
+        <i class="fas fa-check-circle me-2"></i>
+        <span id="successMessage"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true,
+            offset: 100
+        });
+
+        let coordinateIndex = 1;
+
+        function addCoordinateInput() {
+            const coordinateInputs = document.getElementById('coordinateInputs');
+            const newCoordinateGroup = document.createElement('div');
+            newCoordinateGroup.className = 'coordinate-input-group';
+            newCoordinateGroup.setAttribute('data-index', coordinateIndex);
+            
+            newCoordinateGroup.innerHTML = `
+                <div class="coordinate-inputs">
+                    <div>
+                        <label class="form-label-elegant">
+                            <i class="fas fa-compass text-primary"></i>
+                            Latitude
+                        </label>
+                        <input type="number" name="latitudes[]" step="any" 
+                               class="form-control-elegant" placeholder="e.g., 30.1975" required>
+                    </div>
+                    <div>
+                        <label class="form-label-elegant">
+                            <i class="fas fa-compass text-primary"></i>
+                            Longitude
+                        </label>
+                        <input type="number" name="longitudes[]" step="any" 
+                               class="form-control-elegant" placeholder="e.g., 66.9995" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="form-label-elegant">
+                        <i class="fas fa-tag text-primary"></i>
+                        Location Name (Optional)
+                    </label>
+                    <div class="d-flex align-items-center">
+                        <input type="text" name="location_names[]" 
+                               class="form-control-elegant" placeholder="e.g., Proposed Site ${coordinateIndex + 1}">
+                        <button type="button" class="remove-coordinate-btn" onclick="removeCoordinateInput(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            coordinateInputs.appendChild(newCoordinateGroup);
+            coordinateIndex++;
+            
+            // Add animation
+            newCoordinateGroup.style.opacity = '0';
+            newCoordinateGroup.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                newCoordinateGroup.style.transition = 'all 0.3s ease';
+                newCoordinateGroup.style.opacity = '1';
+                newCoordinateGroup.style.transform = 'translateY(0)';
+            }, 10);
+        }
+
+        function removeCoordinateInput(button) {
+            const coordinateGroup = button.closest('.coordinate-input-group');
+            coordinateGroup.style.transition = 'all 0.3s ease';
+            coordinateGroup.style.opacity = '0';
+            coordinateGroup.style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                coordinateGroup.remove();
+            }, 300);
+        }
+
+        function showSuccessNotification(message) {
+            const notification = document.getElementById('successNotification');
+            const messageElement = document.getElementById('successMessage');
+            messageElement.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Form submission handling
+        document.getElementById('analysisForm').addEventListener('submit', function(e) {
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+            analyzeBtn.disabled = true;
+        });
+
+        // Add interactive focus effects
+        document.querySelectorAll('.form-control-elegant, .form-select-elegant').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.closest('.coordinate-input-group')?.classList.add('active');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.closest('.coordinate-input-group')?.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

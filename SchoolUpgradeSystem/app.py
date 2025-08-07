@@ -993,5 +993,37 @@ def configure():
                          functional_count=functional_count,
                          filename='Current Dataset')
 
+@app.route('/ping')
+def ping():
+    """Simple connectivity test endpoint"""
+    return jsonify({
+        'status': 'success',
+        'message': 'School Upgrade System is running!',
+        'server_ip': request.host,
+        'your_ip': request.remote_addr,
+        'timestamp': datetime.now().isoformat()
+    })
+
+@app.route('/health')
+def health():
+    """Health check endpoint"""
+    return '''
+    <html>
+    <head><title>System Health Check</title></head>
+    <body style="font-family: Arial; padding: 20px; background: #f0f0f0;">
+        <h1 style="color: #2563eb;">🏫 School Upgrade System</h1>
+        <h2 style="color: #059669;">✅ Server is Running!</h2>
+        <p><strong>Server Time:</strong> ''' + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '''</p>
+        <p><strong>Your IP:</strong> ''' + request.remote_addr + '''</p>
+        <p><strong>Server Host:</strong> ''' + request.host + '''</p>
+        <p style="margin-top: 30px;">
+            <a href="/" style="background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                Go to Main Application
+            </a>
+        </p>
+    </body>
+    </html>
+    '''
+
 if __name__ == '__main__':
-    app.run(debug=True, port=5010, host='127.0.0.1')
+    app.run(debug=True, port=5010, host='0.0.0.0')
