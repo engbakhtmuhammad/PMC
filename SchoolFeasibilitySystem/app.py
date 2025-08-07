@@ -496,9 +496,14 @@ def analyze():
         same_level_schools = existing_schools[existing_schools['SchoolLevel'] == school_level]
         
         for proposal in proposals:
+            # Validate proposal coordinates
+            if proposal['latitude'] is None or proposal['longitude'] is None:
+                flash(f"Invalid coordinates for {proposal['location_name']}", 'error')
+                return redirect(url_for('configure'))
+                
             result = {
-                'latitude': proposal['latitude'],
-                'longitude': proposal['longitude'],
+                'latitude': float(proposal['latitude']),
+                'longitude': float(proposal['longitude']),
                 'location_name': proposal['location_name'],
                 'feasible': True,
                 'nearest_school': None,
@@ -510,17 +515,26 @@ def analyze():
             nearest_school = None
             
             for _, school in same_level_schools.iterrows():
-                if pd.notna(school['_xCord']) and pd.notna(school['_yCord']):
-                    school_coord = (school['_yCord'], school['_xCord'])  # Note: _yCord is lat, _xCord is lng
-                    proposal_coord = (proposal['latitude'], proposal['longitude'])
+                # Check if school coordinates are valid
+                if (pd.notna(school['_xCord']) and pd.notna(school['_yCord']) and 
+                    school['_xCord'] is not None and school['_yCord'] is not None):
                     
                     try:
+                        # Ensure coordinates are float
+                        school_lat = float(school['_yCord'])
+                        school_lng = float(school['_xCord'])
+                        proposal_lat = float(proposal['latitude'])
+                        proposal_lng = float(proposal['longitude'])
+                        
+                        school_coord = (school_lat, school_lng)
+                        proposal_coord = (proposal_lat, proposal_lng)
+                        
                         distance = geodesic(proposal_coord, school_coord).kilometers
                         if distance < min_dist:
                             min_dist = distance
                             nearest_school = school.to_dict()
-                    except Exception as e:
-                        print(f"Error calculating distance: {e}")
+                    except (ValueError, TypeError, Exception) as e:
+                        print(f"Error calculating distance for school {school.get('SchoolName', 'Unknown')}: {e}")
                         continue
             
             if nearest_school is not None:
