@@ -121,6 +121,18 @@ class SchoolProgressionAnalyzer:
                 else:
                     self.all_schools_df['SchoolName'] = 'Unknown School'
 
+            # BEMIS / EMIS code mapping for all schools
+            if 'BEMISCode' not in self.all_schools_df.columns:
+                code_candidates = ['BEMISCode', 'BEMIS', 'BemisCode', 'EMISCode', 'EMIS', 'SEMIS', 'SEMISCode', 'SchoolCode', 'Code']
+                for c in code_candidates:
+                    if c in self.all_schools_df.columns:
+                        self.all_schools_df['BEMISCode'] = self.all_schools_df[c].astype(str)
+                        print(f"Mapped {c} → BEMISCode")
+                        break
+                else:
+                    # generate stable synthetic code if missing
+                    self.all_schools_df['BEMISCode'] = [f"SCH-{i+1}" for i in range(len(self.all_schools_df))]
+                    print("Generated placeholder BEMISCode values for all schools")
             # Handle district column
             district_mappings = ['District', 'district', 'DISTRICT']
             if 'District' not in self.all_schools_df.columns:
@@ -198,11 +210,24 @@ class SchoolProgressionAnalyzer:
                         break
                 else:
                     self.target_schools_df['SchoolName'] = 'Unknown School'
-
+            # BEMIS / EMIS code mapping for target schools
+            if 'BEMISCode' not in self.target_schools_df.columns:
+                code_candidates = ['BEMISCode', 'BEMIS', 'BemisCode', 'EMISCode', 'EMIS', 'SEMIS', 'SEMISCode', 'SchoolCode', 'Code']
+                for c in code_candidates:
+                    if c in self.target_schools_df.columns:
+                        self.target_schools_df['BEMISCode'] = self.target_schools_df[c].astype(str)
+                        print(f"Target: Mapped {c} → BEMISCode")
+                        break
+                else:
+                    self.target_schools_df['BEMISCode'] = [f"TGT-{i+1}" for i in range(len(self.target_schools_df))]
+                    print("Generated placeholder BEMISCode values for target schools")
+            # Handle district column
+            district_mappings = ['District', 'district', 'DISTRICT']
             if 'District' not in self.target_schools_df.columns:
-                for alt_name in ['district', 'DISTRICT']:
+                for alt_name in district_mappings:
                     if alt_name in self.target_schools_df.columns:
                         self.target_schools_df['District'] = self.target_schools_df[alt_name]
+                        print(f"Mapped {alt_name} → District")
                         break
                 else:
                     self.target_schools_df['District'] = 'Unknown District'
@@ -752,19 +777,15 @@ def download_results():
     try:
         # Load state to get the latest results
         load_analyzer_state()
-        
         if not hasattr(analyzer, 'latest_results') or analyzer.latest_results is None:
             return jsonify({'error': 'No analysis results found. Please perform an analysis first.'}), 404
-        
         results = analyzer.latest_results
-        
         # Create detailed DataFrame matching SchoolUpgradeSystem format
         df_results = []
         for i, result in enumerate(results['progression_results']):
             target = result['target_school']
-            
-            # Create a row for the target school (following SchoolUpgradeSystem format)
             row = {
+                'Target_BEMIS_Code': target.get('BEMISCode',''),
                 'SchoolName': target['SchoolName'],
                 'District': target.get('District', 'Unknown'),
                 'CurrentLevel': target['SchoolLevel'],
@@ -776,37 +797,25 @@ def download_results():
                 'Total_Progression_Schools_Found': result.get('total_found', 0),
                 'Analysis_Message': result.get('message', ''),
                 'Nearest_Progression_School': '',
+                'Nearest_Progression_BEMIS_Code': '',
                 'Distance_to_Nearest_KM': '',
                 'Progression_School_District': ''
             }
-            
-            # If progression schools found, add details of the nearest one
             if result.get('nearest_schools') and len(result['nearest_schools']) > 0:
-                nearest = result['nearest_schools'][0]  # Get closest school
+                nearest = result['nearest_schools'][0]
                 row.update({
-                    'Nearest_Progression_School': nearest['SchoolName'],
+                    'Nearest_Progression_School': nearest.get('SchoolName',''),
+                    'Nearest_Progression_BEMIS_Code': nearest.get('BEMISCode',''),
                     'Distance_to_Nearest_KM': round(nearest.get('distance_km', 0), 2),
                     'Progression_School_District': nearest.get('District', 'Unknown')
                 })
-            
             df_results.append(row)
-        
         df = pd.DataFrame(df_results)
-        
-        # Create download filename
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"school_progression_analysis_{timestamp}.csv"
         filepath = os.path.join(app.config['DOWNLOAD_FOLDER'], filename)
-        
-        # Save to CSV
         df.to_csv(filepath, index=False)
-        
-        # Return the file as attachment
-        return send_file(filepath, 
-                        mimetype='text/csv',
-                        as_attachment=True,
-                        download_name=filename)
-        
+        return send_file(filepath, mimetype='text/csv', as_attachment=True, download_name=filename)
     except Exception as e:
         print(f"Download error: {str(e)}")
         return jsonify({'error': f'Error generating download: {str(e)}'}), 500
