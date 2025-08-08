@@ -1,0 +1,6 @@
+BemisCode,SchoolName,District,Tehsil,SubTehsil,UC,VillageName,Gender,SchoolLevel,FunctionalStatus,ReasonOfNonFunctional,Building,BuildingStructure,BuildingCondition,SpaceForNewRooms,BoundaryWall,BoundaryWallStructure,BoundaryWallCondition,ElectricityInSchool,TotalStudentProfileEntered,Source,_xCord,_yCord
+B001,Sample Primary School,Quetta,Quetta,Quetta,UC1,Village1,Boys,Primary,Functional,,Yes,Concrete,Good,Yes,Yes,Concrete,Good,Yes,150,Government,67.0103,30.1798
+B002,Sample Middle School,Quetta,Quetta,Quetta,UC2,Village2,Girls,Middle,Functional,,Yes,Concrete,Good,Yes,Yes,Concrete,Good,Yes,200,Government,67.0203,30.1898
+B003,Sample High School,Ziarat,Ziarat,Ziarat,UC3,Village3,Boys,High,Functional,,Yes,Concrete,Good,No,Yes,Concrete,Good,Yes,300,Government,67.7256,30.3822
+B004,Sample Secondary School,Ziarat,Ziarat,Ziarat,UC4,Village4,Girls,Higher Secondary,Functional,,Yes,Concrete,Good,No,Yes,Concrete,Good,Yes,250,Government,67.7356,30.3922
+B005,Sample Primary School 2,Quetta,Quetta,Quetta,UC5,Village5,Co-Education,Primary,Functional,,Yes,Concrete,Good,Yes,Yes,Concrete,Good,Yes,100,Government,67.0303,30.1998

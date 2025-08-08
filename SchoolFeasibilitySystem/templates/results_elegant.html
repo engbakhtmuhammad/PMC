@@ -558,6 +558,7 @@
                         </div>
                         <h3>{{ feasible_count }}</h3>
                         <p>Feasible Locations</p>
+                        <small>{{ highly_recommended or 0 }} Highly Recommended</small>
                     </div>
                     <div class="stats-card" data-aos="zoom-in" data-aos-delay="300">
                         <div class="stats-card-icon danger">
@@ -565,49 +566,47 @@
                         </div>
                         <h3>{{ not_feasible_count }}</h3>
                         <p>Not Feasible</p>
+                        <small>Distance conflicts detected</small>
                     </div>
                     <div class="stats-card" data-aos="zoom-in" data-aos-delay="400">
                         <div class="stats-card-icon info">
                             <i class="fas fa-map-marker-alt"></i>
                         </div>
                         <h3>{{ total_proposed }}</h3>
-                        <p>Total Proposed</p>
+                        <p>Total Analyzed</p>
+                        <small>{{ selected_levels|length }} levels checked</small>
                     </div>
                     <div class="stats-card" data-aos="zoom-in" data-aos-delay="500">
-                        <div class="stats-card-icon warning">
-                            <i class="fas fa-school"></i>
+                        <div class="stats-card-icon primary">
+                            <i class="fas fa-percentage"></i>
                         </div>
-                        <h3>{{ total_existing }}</h3>
+                        <h3>{{ ((feasible_count / total_proposed) * 100) | round(1) if total_proposed > 0 else 0 }}%</h3>
+                        <p>Success Rate</p>
+                        <small>Feasibility percentage</small>
+                    </div>
                         <p>Existing Schools</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Interactive Map -->
+        <!-- Enhanced Interactive Map -->
         <div class="card-elegant" data-aos="fade-up" data-aos-delay="200">
             <div class="card-header-elegant">
-                <h2><i class="fas fa-map me-3"></i>Interactive Feasibility Map</h2>
-                <p>Visual representation of proposed locations and existing schools</p>
+                <h2><i class="fas fa-map me-3"></i>Enhanced Feasibility Map</h2>
+                <p>Interactive visualization with feasibility analysis, nearest schools, and conflict indicators</p>
             </div>
             <div class="card-body-elegant p-0">
                 <div class="map-container-elegant position-relative">
-                    <div id="map" class="map-container"></div>
-                    <div class="map-legend">
-                        <h6 class="fw-bold mb-2">Legend</h6>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: #059669;"></div>
-                            <span>Feasible Location</span>
+                    {% if map_html %}
+                        {{ map_html|safe }}
+                    {% else %}
+                        <div class="no-map-message text-center py-5">
+                            <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+                            <h5>Map Not Available</h5>
+                            <p class="text-muted">Unable to generate map visualization for the analysis results.</p>
                         </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: #dc2626;"></div>
-                            <span>Not Feasible</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color" style="background-color: #2563eb;"></div>
-                            <span>Existing {{ school_level }} School</span>
-                        </div>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -625,18 +624,22 @@
                             <thead>
                                 <tr>
                                     <th><i class="fas fa-hashtag me-2"></i>Location</th>
+                                    <th><i class="fas fa-graduation-cap me-2"></i>Level</th>
                                     <th><i class="fas fa-map-pin me-2"></i>Coordinates</th>
                                     <th><i class="fas fa-check-circle me-2"></i>Feasibility</th>
-                                    <th><i class="fas fa-ruler me-2"></i>Nearest School</th>
-                                    <th><i class="fas fa-road me-2"></i>Distance (km)</th>
-                                    <th><i class="fas fa-lightbulb me-2"></i>Recommendation</th>
+                                    <th><i class="fas fa-exclamation-triangle me-2"></i>Risk</th>
+                                    <th><i class="fas fa-users me-2"></i>Students Nearby</th>
+                                    <th><i class="fas fa-lightbulb me-2"></i>Analysis</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for result in results %}
                                 <tr>
                                     <td class="fw-bold">
-                                        {{ result.location_name or 'Proposed Site ' + loop.index|string }}
+                                        {{ result.proposal_name or 'Proposed Site ' + loop.index|string }}
+                                    </td>
+                                    <td>
+                                        <span class="badge level-badge">{{ result.proposed_level }}</span>
                                     </td>
                                     <td>
                                         <small class="text-muted">
@@ -644,47 +647,48 @@
                                         </small>
                                     </td>
                                     <td>
-                                        {% if result.feasible %}
+                                        {% if result.is_feasible %}
                                             <span class="feasibility-indicator feasible">
                                                 <i class="fas fa-check"></i>
-                                                Feasible
+                                                {{ result.recommendation }}
                                             </span>
                                         {% else %}
                                             <span class="feasibility-indicator not-feasible">
                                                 <i class="fas fa-times"></i>
-                                                Not Feasible
+                                                {{ result.recommendation }}
                                             </span>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if result.nearest_school %}
-                                            {{ result.nearest_school.get('School_Name', 'Unknown School') }}
-                                            <br><small class="text-muted">{{ result.nearest_school.get('Level', 'Unknown Level') }}</small>
-                                        {% else %}
-                                            <span class="text-muted">No nearby schools</span>
-                                        {% endif %}
+                                        <span class="risk-indicator risk-{{ result.risk_level.lower().replace(' ', '-') }}">
+                                            {% if result.risk_level == 'Very Low' or result.risk_level == 'Low' %}
+                                                <i class="fas fa-check-circle"></i>
+                                            {% elif result.risk_level == 'Medium' %}
+                                                <i class="fas fa-exclamation-circle"></i>
+                                            {% else %}
+                                                <i class="fas fa-times-circle"></i>
+                                            {% endif %}
+                                            {{ result.risk_level }}
+                                        </span>
                                     </td>
                                     <td>
-                                        {% if result.distance_to_nearest %}
-                                            <span class="fw-bold {% if result.distance_to_nearest < min_distance %}text-danger{% else %}text-success{% endif %}">
-                                                {{ "%.2f"|format(result.distance_to_nearest) }} km
-                                            </span>
-                                        {% else %}
-                                            <span class="text-muted">N/A</span>
-                                        {% endif %}
+                                        <div class="text-center">
+                                            <strong>{{ result.get('total_students_nearby', 0) }}</strong>
+                                            <br><small class="text-muted">{{ result.nearby_schools_count }} schools</small>
+                                        </div>
                                     </td>
                                     <td>
-                                        {% if result.feasible %}
-                                            <span class="text-success fw-bold">
-                                                <i class="fas fa-thumbs-up me-1"></i>
-                                                Recommended
-                                            </span>
-                                        {% else %}
-                                            <span class="text-danger fw-bold">
-                                                <i class="fas fa-exclamation-triangle me-1"></i>
-                                                Too close to existing school
-                                            </span>
-                                        {% endif %}
+                                        <div class="analysis-summary">
+                                            <p class="mb-1"><strong>{{ result.reason }}</strong></p>
+                                            {% if result.get('nearest_schools_by_level') %}
+                                                <small class="text-muted">
+                                                    <strong>Nearest schools:</strong><br>
+                                                    {% for level, info in result.nearest_schools_by_level.items() %}
+                                                        • {{ level }}: {{ info.distance }}km<br>
+                                                    {% endfor %}
+                                                </small>
+                                            {% endif %}
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -730,106 +734,6 @@
             offset: 100
         });
 
-        // Initialize map
-        var map = L.map('map').setView([{{ center_lat }}, {{ center_lng }}], 10);
-
-        // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Custom icons
-        var feasibleIcon = L.divIcon({
-            className: 'custom-div-icon',
-            html: '<div style="background-color: #059669; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>',
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
-        });
-
-        var notFeasibleIcon = L.divIcon({
-            className: 'custom-div-icon',
-            html: '<div style="background-color: #dc2626; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>',
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
-        });
-
-        var existingIcon = L.divIcon({
-            className: 'custom-div-icon',
-            html: '<div style="background-color: #2563eb; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
-        });
-
-        // Add proposed locations
-        {% for result in results %}
-        var marker = L.marker([{{ result.latitude }}, {{ result.longitude }}], {
-            icon: {% if result.feasible %}feasibleIcon{% else %}notFeasibleIcon{% endif %}
-        }).addTo(map);
-        
-        marker.bindPopup(`
-            <div style="min-width: 200px;">
-                <h6 style="margin-bottom: 10px; color: #1f2937; font-weight: bold;">
-                    {{ result.location_name or 'Proposed Site ' + loop.index|string }}
-                </h6>
-                <p style="margin: 5px 0; font-size: 14px;">
-                    <strong>Status:</strong> 
-                    <span style="color: {% if result.feasible %}#059669{% else %}#dc2626{% endif %};">
-                        {% if result.feasible %}✓ Feasible{% else %}✗ Not Feasible{% endif %}
-                    </span>
-                </p>
-                <p style="margin: 5px 0; font-size: 14px;">
-                    <strong>Coordinates:</strong> {{ "%.6f"|format(result.latitude) }}, {{ "%.6f"|format(result.longitude) }}
-                </p>
-                {% if result.nearest_school %}
-                <p style="margin: 5px 0; font-size: 14px;">
-                    <strong>Nearest School:</strong> {{ result.nearest_school.get('School_Name', 'Unknown') }}
-                </p>
-                <p style="margin: 5px 0; font-size: 14px;">
-                    <strong>Distance:</strong> {{ "%.2f"|format(result.distance_to_nearest) }} km
-                </p>
-                {% endif %}
-            </div>
-        `);
-        {% endfor %}
-
-        // Add existing schools
-        {% for school in existing_schools %}
-        {% if school.get('Latitude') and school.get('Longitude') %}
-        var existingMarker = L.marker([{{ school.Latitude }}, {{ school.Longitude }}], {
-            icon: existingIcon
-        }).addTo(map);
-        
-        existingMarker.bindPopup(`
-            <div style="min-width: 200px;">
-                <h6 style="margin-bottom: 10px; color: #1f2937; font-weight: bold;">
-                    {{ school.get('School_Name', 'Unknown School') }}
-                </h6>
-                <p style="margin: 5px 0; font-size: 14px;">
-                    <strong>Level:</strong> {{ school.get('Level', 'Unknown') }}
-                </p>
-                <p style="margin: 5px 0; font-size: 14px;">
-                    <strong>Type:</strong> Existing School
-                </p>
-                <p style="margin: 5px 0; font-size: 14px;">
-                    <strong>Coordinates:</strong> {{ "%.6f"|format(school.Latitude) }}, {{ "%.6f"|format(school.Longitude) }}
-                </p>
-            </div>
-        `);
-        {% endif %}
-        {% endfor %}
-
-        // Fit map to show all markers
-        var group = new L.featureGroup();
-        map.eachLayer(function(layer) {
-            if (layer instanceof L.Marker) {
-                group.addLayer(layer);
-            }
-        });
-        
-        if (group.getLayers().length > 0) {
-            map.fitBounds(group.getBounds().pad(0.1));
-        }
-
         // Success notification function
         function showSuccessNotification(message) {
             const notification = document.getElementById('successNotification');
@@ -844,11 +748,8 @@
 
         // Add download button functionality
         document.querySelector('.btn-download').addEventListener('click', function() {
-            showSuccessNotification('Downloading feasibility analysis report...');
+            showSuccessNotification('Downloading enhanced feasibility analysis report...');
         });
-
-        // Add map controls
-        map.addControl(new L.Control.Fullscreen());
     </script>
 </body>
 </html>

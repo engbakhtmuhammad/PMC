@@ -438,6 +438,69 @@
             color: white;
         }
 
+        /* Checkbox Group Styles */
+        .checkbox-group {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--gray-400);
+            border-radius: var(--radius-sm);
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-item input[type="checkbox"]:checked + .checkmark {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .checkbox-item input[type="checkbox"]:checked + .checkmark::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .checkbox-item.selected {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.1);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .coordinate-inputs {
@@ -534,18 +597,63 @@
                     <div class="form-group-elegant">
                         <label class="form-label-elegant">
                             <i class="fas fa-graduation-cap text-primary"></i>
-                            Proposed School Level
+                            Proposed School Level Selection
                         </label>
-                        <select name="school_level" class="form-select-elegant" required>
-                            <option value="">Select school level...</option>
-                            <option value="Primary">Primary School</option>
-                            <option value="Middle">Middle School</option>
-                            <option value="High">High School</option>
-                            <option value="Higher Secondary">Higher Secondary School</option>
-                        </select>
+                        <div class="checkbox-group mb-3">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="all_levels" name="school_levels" value="all" checked>
+                                <span class="checkmark"></span>
+                                <div>
+                                    <strong>All School Levels</strong>
+                                    <div class="text-muted small">Analyze for all education levels</div>
+                                </div>
+                            </div>
+                            {% for level in available_levels %}
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="school_levels" value="{{ level }}" class="level-checkbox">
+                                <span class="checkmark"></span>
+                                <div>
+                                    <strong>{{ level }} School</strong>
+                                    <div class="text-muted small">{{ level_counts.get(level, 0) }} existing schools</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                         <div class="form-text mt-2">
                             <i class="fas fa-info-circle text-info"></i>
-                            The system will check feasibility based on proximity to existing schools of the same level.
+                            The system will check feasibility based on proximity to existing schools of selected levels.
+                        </div>
+                    </div>
+
+                    <!-- District Filter -->
+                    <div class="form-group-elegant">
+                        <label class="form-label-elegant">
+                            <i class="fas fa-map-marker-alt text-primary"></i>
+                            District Selection
+                        </label>
+                        <div class="checkbox-group mb-3">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="all_districts" name="districts" value="all" checked>
+                                <span class="checkmark"></span>
+                                <div>
+                                    <strong>All Districts</strong>
+                                    <div class="text-muted small">Include all available districts</div>
+                                </div>
+                            </div>
+                            {% for district in available_districts %}
+                            <div class="checkbox-item">
+                                <input type="checkbox" name="districts" value="{{ district }}" class="district-checkbox">
+                                <span class="checkmark"></span>
+                                <div>
+                                    <strong>{{ district }}</strong>
+                                    <div class="text-muted small">{{ district_counts.get(district, 0) }} schools</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="form-text mt-2">
+                            <i class="fas fa-info-circle text-info"></i>
+                            Filter existing schools by district for more focused analysis.
                         </div>
                     </div>
 
@@ -650,6 +758,74 @@
 
         let coordinateIndex = 1;
 
+        // Checkbox interaction handlers
+        function initializeCheckboxes() {
+            // Handle "All Districts" checkbox
+            const allDistrictsCheckbox = document.getElementById('all_districts');
+            const districtCheckboxes = document.querySelectorAll('.district-checkbox');
+            
+            if (allDistrictsCheckbox) {
+                allDistrictsCheckbox.addEventListener('change', function() {
+                    districtCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                        checkbox.closest('.checkbox-item').classList.remove('selected');
+                    });
+                    updateCheckboxStyle(this);
+                });
+            }
+            
+            districtCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked && allDistrictsCheckbox) {
+                        allDistrictsCheckbox.checked = false;
+                        allDistrictsCheckbox.closest('.checkbox-item').classList.remove('selected');
+                    }
+                    updateCheckboxStyle(this);
+                });
+            });
+
+            // Handle "All Levels" checkbox
+            const allLevelsCheckbox = document.getElementById('all_levels');
+            const levelCheckboxes = document.querySelectorAll('.level-checkbox');
+            
+            if (allLevelsCheckbox) {
+                allLevelsCheckbox.addEventListener('change', function() {
+                    levelCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false;
+                        checkbox.closest('.checkbox-item').classList.remove('selected');
+                    });
+                    updateCheckboxStyle(this);
+                });
+            }
+            
+            levelCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked && allLevelsCheckbox) {
+                        allLevelsCheckbox.checked = false;
+                        allLevelsCheckbox.closest('.checkbox-item').classList.remove('selected');
+                    }
+                    updateCheckboxStyle(this);
+                });
+            });
+
+            // Initialize all checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                updateCheckboxStyle(checkbox);
+                checkbox.addEventListener('change', function() {
+                    updateCheckboxStyle(this);
+                });
+            });
+        }
+
+        function updateCheckboxStyle(checkbox) {
+            const checkboxItem = checkbox.closest('.checkbox-item');
+            if (checkbox.checked) {
+                checkboxItem.classList.add('selected');
+            } else {
+                checkboxItem.classList.remove('selected');
+            }
+        }
+
         function addCoordinateInput() {
             const coordinateInputs = document.getElementById('coordinateInputs');
             const newCoordinateGroup = document.createElement('div');
@@ -740,6 +916,11 @@
             input.addEventListener('blur', function() {
                 this.closest('.coordinate-input-group')?.classList.remove('active');
             });
+        });
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCheckboxes();
         });
     </script>
 </body>

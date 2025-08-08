@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Balochistan School Progression System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/elegant-enhancements.css') }}">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #0891b2;
+            --accent-color: #dc2626;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --info-color: #0284c7;
+            --dark-color: #1f2937;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+            --gradient-success: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            --gradient-info: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-3xl: 2rem;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gradient-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="white" stop-opacity="0.1"/><stop offset="100%" stop-color="white" stop-opacity="0"/></radialGradient></defs><circle cx="150" cy="150" r="60" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;800,800;0,0" dur="25s" repeatCount="indefinite"/></circle><circle cx="850" cy="250" r="40" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;-700,600;0,0" dur="20s" repeatCount="indefinite"/></circle><circle cx="300" cy="750" r="50" fill="url(%23a)"><animateTransform attributeName="transform" type="translate" values="0,0;600,-400;0,0" dur="30s" repeatCount="indefinite"/></circle></svg>') center/cover;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Main Container */
+        .main-container {
+            padding: 2rem 0;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-2xl);
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin: 0;
+        }
+
+        .nav-subtitle {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Card Styles */
+        .card-elegant {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-3xl);
+            box-shadow: var(--shadow-2xl);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .card-elegant::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-secondary);
+        }
+
+        .card-elegant:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-2xl), 0 0 40px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Summary Stats */
+        .summary-stats {
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--gradient-info);
+            color: white;
+            padding: 2rem;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card.warning {
+            background: var(--gradient-warning);
+        }
+
+        .stat-card.success {
+            background: var(--gradient-success);
+        }
+
+        .stat-card.primary {
+            background: var(--gradient-primary);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            padding: 2rem;
+            border-top: 1px solid var(--gray-200);
+            text-align: center;
+        }
+
+        .btn-elegant {
+            background: var(--gradient-secondary);
+            border: none;
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: var(--radius-xl);
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            margin: 0.5rem;
+        }
+
+        .btn-elegant::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-elegant:hover::before {
+            left: 100%;
+        }
+
+        .btn-elegant:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+        }
+
+        .btn-elegant.btn-success {
+            background: var(--gradient-success);
+        }
+
+        .btn-elegant.btn-warning {
+            background: var(--gradient-warning);
+        }
+
+        .btn-elegant.btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-elegant.btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Interactive Map */
+        .map-container {
+            padding: 2rem;
+        }
+
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .map-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin: 0;
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .map-frame {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            background: #f8f9fa;
+        }
+
+        .map-frame:empty {
+            min-height: 400px;
+        }
+
+        /* Results Table */
+        .results-table-container {
+            padding: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin: 0;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            padding: 0.5rem 1rem 0.5rem 2.5rem;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            width: 250px;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.1rem rgba(37, 99, 235, 0.15);
+            outline: none;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+
+        .table-elegant {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .table-elegant thead {
+            background: var(--gradient-secondary);
+            color: white;
+        }
+
+        .table-elegant th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: none;
+        }
+
+        .table-elegant td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.9rem;
+        }
+
+        .table-elegant tbody tr:hover {
+            background: var(--gray-50);
+        }
+
+        .table-elegant tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Progress Indicators */
+        .progress-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .progress-indicator.primary {
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary-color);
+        }
+
+        .progress-indicator.middle {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .progress-indicator.high {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--success-color);
+        }
+
+        .progress-indicator.higher-secondary {
+            background: rgba(147, 51, 234, 0.1);
+            color: #9333ea;
+        }
+
+        /* Distance Badge */
+        .distance-badge {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Loading States */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-content {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-2xl);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--gray-200);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Map Container */
+        .map-container {
+            background: white;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            min-height: 500px;
+        }
+
+        .map-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            border-radius: 0;
+        }
+
+        .map-frame {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: var(--radius-lg);
+        }
+
+        /* Ensure Leaflet map tiles load properly */
+        .leaflet-container {
+            background: #f8f9fa;
+            font-family: inherit;
+        }
+
+        .leaflet-tile-container {
+            opacity: 1;
+        }
+
+        /* Custom Map Icon Styles */
+        .leaflet-marker-icon {
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        /* Map Controls */
+        .map-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .map-control-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .map-control-btn:hover {
+            background: var(--gray-50);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Map Header */
+        .map-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .map-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-lg);
+            margin: 1rem 0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .status-message.success {
+            background: rgba(5, 150, 105, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(5, 150, 105, 0.2);
+        }
+
+        .status-message.error {
+            background: rgba(220, 38, 38, 0.1);
+            color: var(--accent-color);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .status-message.info {
+            background: rgba(2, 132, 199, 0.1);
+            color: var(--info-color);
+            border: 1px solid rgba(2, 132, 199, 0.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+
+            .nav-bar {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .summary-stats,
+            .map-container,
+            .results-table-container {
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+
+            .map-header,
+            .table-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .map-controls,
+            .table-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .search-input {
+                width: 100%;
+                min-width: 200px;
+            }
+
+            .map-frame {
+                height: 400px;
+            }
+
+            .table-elegant {
+                font-size: 0.8rem;
+            }
+
+            .table-elegant th,
+            .table-elegant td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .btn-elegant {
+                width: 100%;
+                margin: 0.25rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h4>Generating Reports</h4>
+            <p class="text-muted">Please wait while we prepare your download...</p>
+        </div>
+    </div>
+
+    <div class="container main-container">
+        <!-- Navigation -->
+        <div class="nav-bar" data-aos="fade-down">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="nav-title">Progression Analysis Results</h2>
+                    <p class="nav-subtitle">Your school progression recommendations are ready</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-elegant btn-outline btn-sm" onclick="window.location.href='/configure'">
+                        <i class="fas fa-cog me-2"></i>
+                        Reconfigure
+                    </button>
+                    <button class="btn btn-elegant btn-outline btn-sm" onclick="window.location.href='/?reset=true'">
+                        <i class="fas fa-home me-2"></i>
+                        New Analysis
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="statusMessages"></div>
+
+        <!-- Summary Statistics Card -->
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="200">
+            <div class="summary-stats">
+                <h3 class="section-title mb-3">
+                    <i class="fas fa-chart-bar me-2 text-primary"></i>
+                    Analysis Summary
+                </h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">{{ total_analyzed if total_analyzed else 0 }}</div>
+                        <div class="stat-label">Schools Processed</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-number">{{ schools_with_progression if schools_with_progression else 0 }}</div>
+                        <div class="stat-label">Successful Matches</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-number">{{ schools_without_progression if schools_without_progression else 0 }}</div>
+                        <div class="stat-label">No Progression Found</div>
+                    </div>
+                    <div class="stat-card primary">
+                        <div class="stat-number">
+                            {% if results %}
+                                {% set total_distance = [] %}
+                                {% set count = 0 %}
+                                {% for result in results %}
+                                    {% if result.nearest_schools %}
+                                        {% for school in result.nearest_schools %}
+                                            {% set _ = total_distance.append(school.distance_km) %}
+                                            {% set count = count + 1 %}
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% if count > 0 %}
+                                    {{ "%.1f"|format((total_distance|sum) / count) }}
+                                {% else %}
+                                    0.0
+                                {% endif %}
+                            {% else %}
+                                0.0
+                            {% endif %}
+                            km
+                        </div>
+                        <div class="stat-label">Avg. Distance</div>
+                    </div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-elegant btn-success" onclick="downloadCSV()">
+                    <i class="fas fa-download me-2"></i>
+                    Download Results (CSV)
+                </button>
+                <button class="btn btn-elegant" onclick="refreshAnalysis()">
+                    <i class="fas fa-sync me-2"></i>
+                    Refresh Analysis
+                </button>
+            </div>
+        </div>
+
+        <!-- Interactive Map Card -->
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="400">
+            <div class="map-container">
+                <div class="map-header">
+                    <h3 class="map-title">
+                        <i class="fas fa-map-marked-alt me-2 text-primary"></i>
+                        Interactive Progression Map
+                    </h3>
+                    <div class="map-controls">
+                        <button class="btn btn-elegant btn-sm" onclick="toggleMapFullscreen()">
+                            <i class="fas fa-expand me-2"></i>
+                            Fullscreen
+                        </button>
+                    </div>
+                </div>
+                {% if map_html %}
+                <iframe id="mapFrame" class="map-frame" srcdoc="{{ map_html | safe }}" title="Progression Map"></iframe>
+                <div class="text-muted small mt-2">If map tiles do not appear, refresh the page; ensure internet access for tile servers.</div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-map text-muted" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3 text-muted">No Map Available</h4>
+                    <p class="text-muted">Map will be generated after successful analysis</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Results Table Card -->
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="600">
+            <div class="results-table-container">
+                <div class="table-header">
+                    <h3 class="table-title">
+                        <i class="fas fa-table me-2 text-primary"></i>
+                        Detailed Results
+                    </h3>
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" id="searchInput" placeholder="Search schools...">
+                        </div>
+                    </div>
+                </div>
+
+                {% if results %}
+                <div class="table-responsive">
+                    <table class="table-elegant" id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>School Name</th>
+                                <th>District</th>
+                                <th>Current Level</th>
+                                <th>Recommended Progression</th>
+                                <th>Gender Type</th>
+                                <th>Priority</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                            <tr>
+                                <td>
+                                    <strong>{{ result.target_school.SchoolName }}</strong>
+                                    {% if result.target_school.get('VillageName') %}
+                                    <div class="text-muted small">{{ result.target_school.VillageName }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>{{ result.target_school.District }}</td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ result.current_level }}</span>
+                                </td>
+                                <td>
+                                    {% if result.progression_level %}
+                                    <span class="upgrade-badge upgrade-{{ result.progression_level.lower().replace(' ', '-').replace('_', '-') }}">
+                                        {{ result.progression_level }}
+                                    </span>
+                                    {% else %}
+                                    <span class="text-muted">No Progression</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ result.target_school.get('Gender', 'Mixed') }}</td>
+                                <td>
+                                    {% if loop.index <= 10 %}
+                                        <span class="badge bg-danger">High</span>
+                                    {% elif loop.index <= 50 %}
+                                        <span class="badge bg-warning">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-info">Standard</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-table text-muted" style="font-size: 3rem;"></i>
+                    <h4 class="mt-3 text-muted">No Results Available</h4>
+                    <p class="text-muted">Results will appear here after running analysis</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const tableRows = document.querySelectorAll('#resultsTable tbody tr');
+            
+            tableRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const isVisible = text.includes(searchTerm);
+                row.style.display = isVisible ? '' : 'none';
+            });
+        });
+
+        // Download CSV
+        function downloadCSV() {
+            showLoading();
+            
+            fetch('/download_results')
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    throw new Error('Download failed');
+                })
+                .then(blob => {
+                    hideLoading();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `school_progression_results_${new Date().toISOString().slice(0, 10)}.csv`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    showMessage('CSV report downloaded successfully!', 'success');
+                })
+                .catch(error => {
+                    hideLoading();
+                    showMessage('Download failed: ' + error.message, 'error');
+                });
+        }
+
+        // Refresh Analysis
+        function refreshAnalysis() {
+            showLoading();
+            
+            fetch('/results')
+                .then(response => {
+                    hideLoading();
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        throw new Error('Refresh failed');
+                    }
+                })
+                .catch(error => {
+                    hideLoading();
+                    showMessage('Refresh failed: ' + error.message, 'error');
+                });
+        }
+
+        // Toggle Map Fullscreen
+        function toggleMapFullscreen() {
+            const mapFrame = document.getElementById('mapFrame');
+            if (mapFrame) {
+                if (mapFrame.requestFullscreen) {
+                    mapFrame.requestFullscreen();
+                } else if (mapFrame.mozRequestFullScreen) {
+                    mapFrame.mozRequestFullScreen();
+                } else if (mapFrame.webkitRequestFullscreen) {
+                    mapFrame.webkitRequestFullscreen();
+                } else if (mapFrame.msRequestFullscreen) {
+                    mapFrame.msRequestFullscreen();
+                }
+            }
+        }
+
+        // Utility functions
+        function showMessage(message, type) {
+            const statusDiv = document.getElementById('statusMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `status-message ${type}`;
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                        type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            
+            messageDiv.innerHTML = `
+                <i class="fas ${icon}"></i>
+                ${message}
+            `;
+            
+            statusDiv.appendChild(messageDiv);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeResultsPage();
+        });
+        
+        function initializeResultsPage() {
+            // Check if results container exists (indicates we have results)
+            var resultsTable = document.getElementById('resultsTable');
+            var hasResults = resultsTable && resultsTable.querySelector('tbody tr');
+            
+            if (hasResults) {
+                showMessage('Analysis completed successfully!', 'success');
+            } else {
+                showMessage('No analysis results found. Please run an analysis first.', 'info');
+                setTimeout(function() {
+                    window.location.href = '/';
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>

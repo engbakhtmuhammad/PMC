@@ -138,11 +138,15 @@ class SchoolFeasibilityAnalyzer:
         
         return nearby_schools.sort_values('distance_to_proposed')
     
-    def analyze_single_location(self, lat, lon, level, search_radius=20):
-        """Analyze feasibility of a single proposed school location"""
+    def analyze_single_location(self, lat, lon, level, search_radius=20, selected_districts=None):
+        """Enhanced analysis of feasibility for a single proposed school location"""
         
         # Find nearby schools
         nearby_schools = self.find_nearby_schools(lat, lon, level, search_radius)
+        
+        # Filter by selected districts if specified
+        if selected_districts and 'all' not in selected_districts:
+            nearby_schools = nearby_schools[nearby_schools['District'].isin(selected_districts)]
         
         # Get minimum required distance for this school level
         min_distance = MIN_DISTANCES.get(level, 5.0)
@@ -153,20 +157,68 @@ class SchoolFeasibilityAnalyzer:
             (nearby_schools['distance_to_proposed'] < min_distance)
         ]
         
-        # Determine feasibility
+        # Enhanced feasibility analysis
         is_feasible = len(same_level_schools) == 0
         
-        # Create recommendation
+        # Population density analysis
+        total_students_nearby = nearby_schools['TotalStudentProfileEntered'].sum()
+        avg_students_per_school = nearby_schools['TotalStudentProfileEntered'].mean() if len(nearby_schools) > 0 else 0
+        
+        # Infrastructure analysis
+        functional_schools = nearby_schools[nearby_schools['FunctionalStatus'] == 'Functional']
+        functional_percentage = (len(functional_schools) / len(nearby_schools) * 100) if len(nearby_schools) > 0 else 0
+        
+        # Gender analysis
+        gender_distribution = nearby_schools['Gender'].value_counts().to_dict() if 'Gender' in nearby_schools.columns else {}
+        
+        # Create enhanced recommendation
         if is_feasible:
-            recommendation = "RECOMMENDED"
-            reason = f"No {level} school within {min_distance}km radius"
-            risk_level = "Low"
+            recommendation = "FEASIBLE"
+            base_reason = f"No {level} school within {min_distance}km radius"
+            
+            # Add density considerations
+            if total_students_nearby > 1000 and level in ['Primary', 'Middle']:
+                recommendation = "HIGHLY RECOMMENDED"
+                reason = f"{base_reason}. High student density ({total_students_nearby} students) indicates strong demand."
+                risk_level = "Very Low"
+            elif total_students_nearby > 500:
+                recommendation = "RECOMMENDED"
+                reason = f"{base_reason}. Moderate student density ({total_students_nearby} students) supports new school."
+                risk_level = "Low"
+            else:
+                reason = f"{base_reason}. Low student density ({total_students_nearby} students) - consider community need assessment."
+                risk_level = "Low"
         else:
-            recommendation = "NOT RECOMMENDED"
+            recommendation = "NOT FEASIBLE"
             nearest_school = same_level_schools.iloc[0]
             distance = round(nearest_school['distance_to_proposed'], 2)
-            reason = f"{level} school '{nearest_school['SchoolName']}' only {distance}km away (minimum: {min_distance}km)"
-            risk_level = "High"
+            base_reason = f"{level} school '{nearest_school['SchoolName']}' only {distance}km away (minimum: {min_distance}km)"
+            
+            # Enhanced conflict analysis
+            if distance < min_distance * 0.5:
+                risk_level = "Very High"
+                reason = f"{base_reason}. CRITICAL: Too close to existing school - may cause enrollment conflicts."
+            elif distance < min_distance * 0.75:
+                risk_level = "High"
+                reason = f"{base_reason}. HIGH RISK: Close proximity may impact both schools' viability."
+            else:
+                risk_level = "Medium"
+                reason = f"{base_reason}. MODERATE RISK: Consider upgrading existing school instead."
+        
+        # Find nearest schools for each level (for map display)
+        nearest_schools_by_level = {}
+        for school_level in ['Primary', 'Middle', 'High', 'Higher Secondary']:
+            level_schools = nearby_schools[nearby_schools['SchoolLevel'] == school_level]
+            if len(level_schools) > 0:
+                nearest = level_schools.loc[level_schools['distance_to_proposed'].idxmin()]
+                nearest_schools_by_level[school_level] = {
+                    'name': nearest['SchoolName'],
+                    'distance': round(nearest['distance_to_proposed'], 2),
+                    'latitude': nearest['_yCord'],
+                    'longitude': nearest['_xCord'],
+                    'students': nearest['TotalStudentProfileEntered'],
+                    'functional': nearest['FunctionalStatus']
+                }
         
         # Count nearby schools by level
         level_counts = nearby_schools['SchoolLevel'].value_counts().to_dict()
@@ -184,11 +236,16 @@ class SchoolFeasibilityAnalyzer:
             'nearby_schools_count': len(nearby_schools),
             'same_level_conflicts': len(same_level_schools),
             'level_counts': level_counts,
+            'total_students_nearby': total_students_nearby,
+            'avg_students_per_school': round(avg_students_per_school, 1),
+            'functional_percentage': round(functional_percentage, 1),
+            'gender_distribution': gender_distribution,
+            'nearest_schools_by_level': nearest_schools_by_level,
             'nearby_schools': nearby_schools.to_dict('records') if len(nearby_schools) <= 20 else nearby_schools.head(20).to_dict('records')
         }
     
-    def analyze_multiple_locations(self, proposals, search_radius=20):
-        """Analyze multiple proposed school locations"""
+    def analyze_multiple_locations(self, proposals, search_radius=20, selected_districts=None):
+        """Analyze multiple proposed school locations with enhanced analysis"""
         results = []
         
         for i, proposal in enumerate(proposals):
@@ -197,7 +254,7 @@ class SchoolFeasibilityAnalyzer:
             level = proposal['level']
             name = proposal.get('name', f'Proposed School {i+1}')
             
-            analysis = self.analyze_single_location(lat, lon, level, search_radius)
+            analysis = self.analyze_single_location(lat, lon, level, search_radius, selected_districts)
             analysis['proposal_name'] = name
             analysis['proposal_id'] = i + 1
             
@@ -206,7 +263,7 @@ class SchoolFeasibilityAnalyzer:
         return results
     
     def create_feasibility_map(self, analysis_results):
-        """Create interactive map showing proposed locations and existing schools"""
+        """Create enhanced interactive map showing proposed locations and existing schools"""
         if not analysis_results:
             return None
         
@@ -259,28 +316,53 @@ class SchoolFeasibilityAnalyzer:
                     
                     color = level_colors.get(school['SchoolLevel'], '#95a5a6')
                     
+                    # Check if this is a nearest school for any proposal
+                    is_nearest = False
+                    nearest_to_proposals = []
+                    for res in analysis_results:
+                        for level_name, nearest_info in res.get('nearest_schools_by_level', {}).items():
+                            if (abs(nearest_info['latitude'] - school['_yCord']) < 0.001 and 
+                                abs(nearest_info['longitude'] - school['_xCord']) < 0.001):
+                                is_nearest = True
+                                nearest_to_proposals.append(f"{res['proposal_name']} ({level_name})")
+                    
                     popup_html = f"""
-                    <div style="width: 250px; font-family: 'Poppins', sans-serif;">
-                        <h5 style="color: #2c3e50; margin-bottom: 10px; border-bottom: 2px solid #3498db; padding-bottom: 5px;">
+                    <div style="width: 280px; font-family: 'Poppins', sans-serif;">
+                        <h5 style="color: #2c3e50; margin-bottom: 10px; border-bottom: 2px solid {color}; padding-bottom: 5px;">
                             <i class="fas fa-school"></i> {school['SchoolName']}
                         </h5>
                         <p><strong>Level:</strong> <span style="color: {color}; font-weight: bold;">{school['SchoolLevel']}</span></p>
                         <p><strong>District:</strong> {school['District']}</p>
-                        <p><strong>Status:</strong> {school['FunctionalStatus']}</p>
+                        <p><strong>Status:</strong> <span style="color: {'green' if school['FunctionalStatus'] == 'Functional' else 'red'};">{school['FunctionalStatus']}</span></p>
                         <p><strong>Students:</strong> {school['TotalStudentProfileEntered']}</p>
-                    </div>
+                        <p><strong>Distance:</strong> {round(school.get('distance_to_proposed', 0), 2)} km</p>
                     """
+                    
+                    if is_nearest:
+                        popup_html += f"""
+                        <div style="background: #fff3cd; padding: 8px; border-radius: 5px; margin-top: 10px; border: 1px solid #ffc107;">
+                            <strong>⚠️ Nearest School to:</strong><br>
+                            {', '.join(nearest_to_proposals)}
+                        </div>
+                        """
+                    
+                    popup_html += "</div>"
+                    
+                    # Use different styling for nearest schools
+                    marker_size = 10 if is_nearest else 6
+                    marker_weight = 3 if is_nearest else 2
+                    marker_opacity = 1.0 if is_nearest else 0.7
                     
                     folium.CircleMarker(
                         location=[school['_yCord'], school['_xCord']],
-                        radius=6,
-                        popup=folium.Popup(popup_html, max_width=300),
-                        tooltip=f"{school['SchoolName']} ({school['SchoolLevel']})",
+                        radius=marker_size,
+                        popup=folium.Popup(popup_html, max_width=320),
+                        tooltip=f"{school['SchoolName']} ({school['SchoolLevel']})" + (" - NEAREST" if is_nearest else ""),
                         color='white',
-                        weight=2,
+                        weight=marker_weight,
                         fill=True,
                         fillColor=color,
-                        fillOpacity=0.7
+                        fillOpacity=marker_opacity
                     ).add_to(m)
         
         # Add proposed school locations (larger markers)
@@ -289,7 +371,7 @@ class SchoolFeasibilityAnalyzer:
             lon = result['longitude']
             
             # Choose icon and color based on recommendation
-            if result['is_feasible']:
+            if result['recommendation'] in ['FEASIBLE', 'RECOMMENDED', 'HIGHLY RECOMMENDED']:
                 icon_color = 'green'
                 icon_name = 'check'
                 marker_color = '#2ecc71'
@@ -298,8 +380,9 @@ class SchoolFeasibilityAnalyzer:
                 icon_name = 'times'
                 marker_color = '#e74c3c'
             
+            # Enhanced popup with more analysis details
             popup_html = f"""
-            <div style="width: 300px; font-family: 'Poppins', sans-serif;">
+            <div style="width: 350px; font-family: 'Poppins', sans-serif;">
                 <h4 style="color: {marker_color}; margin-bottom: 10px; border-bottom: 3px solid {marker_color}; padding-bottom: 5px;">
                     <i class="fas fa-map-marker-alt"></i> {result['proposal_name']}
                 </h4>
@@ -307,9 +390,27 @@ class SchoolFeasibilityAnalyzer:
                     <strong>Status:</strong> <span style="color: {marker_color}; font-weight: bold;">{result['recommendation']}</span>
                 </div>
                 <p><strong>Proposed Level:</strong> {result['proposed_level']}</p>
-                <p><strong>Risk Level:</strong> {result['risk_level']}</p>
+                <p><strong>Risk Level:</strong> <span style="color: {'green' if result['risk_level'] == 'Low' else 'orange' if result['risk_level'] == 'Medium' else 'red'};">{result['risk_level']}</span></p>
                 <p><strong>Nearby Schools:</strong> {result['nearby_schools_count']}</p>
                 <p><strong>Same Level Conflicts:</strong> {result['same_level_conflicts']}</p>
+                <p><strong>Total Students Nearby:</strong> {result.get('total_students_nearby', 0)}</p>
+                
+                <div style="margin: 10px 0;">
+                    <strong>Nearest Schools by Level:</strong>
+                    <div style="font-size: 12px; margin-top: 5px;">
+            """
+            
+            for level, info in result.get('nearest_schools_by_level', {}).items():
+                popup_html += f"""
+                        <div style="margin: 2px 0; padding: 3px; background: #f8f9fa; border-radius: 3px;">
+                            <strong>{level}:</strong> {info['name']} ({info['distance']} km)
+                        </div>
+                """
+            
+            popup_html += f"""
+                    </div>
+                </div>
+                
                 <div style="background: #fff3cd; padding: 8px; border-radius: 5px; margin-top: 10px;">
                     <strong>Analysis:</strong> {result['reason']}
                 </div>
@@ -318,7 +419,7 @@ class SchoolFeasibilityAnalyzer:
             
             folium.Marker(
                 location=[lat, lon],
-                popup=folium.Popup(popup_html, max_width=350),
+                popup=folium.Popup(popup_html, max_width=400),
                 tooltip=f"📍 {result['proposal_name']} - {result['recommendation']}",
                 icon=folium.Icon(
                     color=icon_color,
@@ -338,14 +439,27 @@ class SchoolFeasibilityAnalyzer:
                 fill=False,
                 opacity=0.5
             ).add_to(m)
+            
+            # Add lines to nearest schools of same level if conflicts exist
+            if result['same_level_conflicts'] > 0:
+                for school in result['nearby_schools']:
+                    if (school['SchoolLevel'] == result['proposed_level'] and 
+                        school['distance_to_proposed'] < result['minimum_distance_required']):
+                        folium.PolyLine(
+                            locations=[[lat, lon], [school['_yCord'], school['_xCord']]],
+                            color='red',
+                            weight=3,
+                            opacity=0.7,
+                            dash_array='10, 5',
+                            popup=f"Conflict: {school['SchoolName']} ({round(school['distance_to_proposed'], 2)} km)"
+                        ).add_to(m)
         
-        # Add enhanced legend
+        # Enhanced legend
         legend_html = '''
         <div style="position: fixed; 
-                    top: 50%; left: 20px; 
-                    transform: translateY(-50%);
-                    width: 320px; 
-                    background-color: rgba(255, 255, 255, 0.97); 
+                    top: 10%; left: 20px; 
+                    width: 340px; 
+                    background-color: rgba(255, 255, 255, 0.98); 
                     border: 3px solid #2c3e50; 
                     border-radius: 15px;
                     z-index: 9999; 
@@ -353,23 +467,31 @@ class SchoolFeasibilityAnalyzer:
                     font-family: 'Poppins', sans-serif;
                     padding: 20px;
                     box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-                    backdrop-filter: blur(10px);">
+                    backdrop-filter: blur(10px);
+                    max-height: 80vh;
+                    overflow-y: auto;">
         <h4 style="color: #2c3e50; margin: 0 0 15px 0; text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 8px;">
-            <i class="fas fa-map-marked-alt"></i> School Feasibility Legend
+            <i class="fas fa-map-marked-alt"></i> Enhanced Feasibility Map
         </h4>
-        <div style="margin-bottom: 20px;">
-            <h5 style="color: #34495e; margin: 0 0 10px 0; font-size: 16px;">Existing Schools:</h5>
-            <p style="margin: 5px 0; display: flex; align-items: center;"><i class="fa fa-circle" style="color: #3498db; margin-right: 8px;"></i> Primary Schools</p>
-            <p style="margin: 5px 0; display: flex; align-items: center;"><i class="fa fa-circle" style="color: #2ecc71; margin-right: 8px;"></i> Middle Schools</p>
-            <p style="margin: 5px 0; display: flex; align-items: center;"><i class="fa fa-circle" style="color: #f39c12; margin-right: 8px;"></i> High Schools</p>
-            <p style="margin: 5px 0; display: flex; align-items: center;"><i class="fa fa-circle" style="color: #e74c3c; margin-right: 8px;"></i> Higher Secondary</p>
+        <div style="margin-bottom: 15px;">
+            <h5 style="color: #34495e; margin: 0 0 8px 0; font-size: 15px;">Existing Schools:</h5>
+            <p style="margin: 3px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-circle" style="color: #3498db; margin-right: 8px;"></i> Primary Schools</p>
+            <p style="margin: 3px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-circle" style="color: #2ecc71; margin-right: 8px;"></i> Middle Schools</p>
+            <p style="margin: 3px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-circle" style="color: #f39c12; margin-right: 8px;"></i> High Schools</p>
+            <p style="margin: 3px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-circle" style="color: #e74c3c; margin-right: 8px;"></i> Higher Secondary</p>
+            <p style="margin: 5px 0; font-size: 11px; color: #666;"><strong>Larger markers</strong> = Nearest to proposals</p>
         </div>
-        <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); padding: 12px; border-radius: 8px; border: 2px solid #fdcb6e;">
-            <h5 style="color: #856404; margin: 0 0 8px 0; font-size: 16px;">Proposed Schools:</h5>
-            <p style="margin: 5px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-check" style="color: green; margin-right: 8px;"></i> Recommended Location</p>
-            <p style="margin: 5px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-times" style="color: red; margin-right: 8px;"></i> Not Recommended</p>
-            <p style="margin: 0; font-size: 11px; color: #856404; font-weight: 500; margin-top: 8px;">
-                <strong>Circles</strong> show minimum distance requirements
+        <div style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); padding: 10px; border-radius: 8px; border: 2px solid #fdcb6e; margin-bottom: 15px;">
+            <h5 style="color: #856404; margin: 0 0 6px 0; font-size: 15px;">Proposed Schools:</h5>
+            <p style="margin: 3px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-check" style="color: green; margin-right: 8px;"></i> Feasible Location</p>
+            <p style="margin: 3px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-times" style="color: red; margin-right: 8px;"></i> Not Feasible</p>
+        </div>
+        <div style="background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); padding: 10px; border-radius: 8px; border: 2px solid #dc3545;">
+            <h5 style="color: #721c24; margin: 0 0 6px 0; font-size: 15px;">Conflict Indicators:</h5>
+            <p style="margin: 3px 0; display: flex; align-items: center; font-size: 12px;"><span style="border-bottom: 3px dashed red; margin-right: 8px; width: 15px;"></span> Distance Conflicts</p>
+            <p style="margin: 3px 0; display: flex; align-items: center; font-size: 12px;"><i class="fa fa-circle-o" style="color: #666; margin-right: 8px;"></i> Minimum Distance Zones</p>
+            <p style="margin: 0; font-size: 10px; color: #721c24; font-weight: 500; margin-top: 5px;">
+                Red dashed lines connect conflicting schools
             </p>
         </div>
         </div>
@@ -407,6 +529,8 @@ def upload_file():
         success, message = analyzer.load_data(filepath)
         
         if success:
+            # Store filename in session for later use
+            session['uploaded_filename'] = filename
             flash(message, 'success')
             return redirect(url_for('configure'))
         else:
@@ -424,9 +548,9 @@ def configure():
         return redirect(url_for('index'))
     
     # Get data statistics for the form
-    districts = sorted(analyzer.schools_df['District'].unique())
-    levels = sorted(analyzer.schools_df['SchoolLevel'].unique())
-    genders = sorted(analyzer.schools_df['Gender'].unique())
+    available_districts = sorted(analyzer.schools_df['District'].unique().tolist())
+    available_levels = sorted(analyzer.schools_df['SchoolLevel'].unique().tolist())
+    available_genders = sorted(analyzer.schools_df['Gender'].unique().tolist())
     
     district_counts = analyzer.schools_df['District'].value_counts().to_dict()
     level_counts = analyzer.schools_df['SchoolLevel'].value_counts().to_dict()
@@ -434,31 +558,65 @@ def configure():
     
     total_schools = len(analyzer.schools_df)
     functional_count = len(analyzer.schools_df[analyzer.schools_df['FunctionalStatus'] == 'Functional'])
+    valid_coordinates = len(analyzer.schools_df.dropna(subset=['_xCord', '_yCord']))
+    
+    # Find coordinate columns dynamically
+    lat_col = None
+    lng_col = None
+    for col in analyzer.schools_df.columns:
+        col_lower = col.lower()
+        if 'lat' in col_lower or col in ['_yCord', 'Latitude', 'Y']:
+            lat_col = col
+        elif 'lon' in col_lower or 'lng' in col_lower or col in ['_xCord', 'Longitude', 'X']:
+            lng_col = col
+    
+    # Get the last uploaded filename from session or default
+    filename = session.get('uploaded_filename', 'sample_schools.csv')
     
     return render_template('configure_elegant.html',
-                         districts=districts,
-                         levels=levels,
-                         genders=genders,
+                         available_districts=available_districts,
+                         available_levels=available_levels,
+                         available_genders=available_genders,
                          district_counts=district_counts,
                          level_counts=level_counts,
                          gender_counts=gender_counts,
                          total_schools=total_schools,
                          functional_count=functional_count,
+                         valid_coordinates=valid_coordinates,
+                         filename=filename,
+                         school_levels=available_levels,
                          min_distances=MIN_DISTANCES)
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
     try:
+        # Debug: Print all form data
+        print("=== ENHANCED ANALYZE ROUTE DEBUG ===")
+        print(f"Form data: {dict(request.form)}")
+        print(f"Districts: {request.form.getlist('districts')}")
+        print(f"School levels: {request.form.getlist('school_levels')}")
+        print(f"Min distance: {request.form.get('min_distance')}")
+        print(f"Latitudes: {request.form.getlist('latitudes[]')}")
+        print(f"Longitudes: {request.form.getlist('longitudes[]')}")
+        print(f"Location names: {request.form.getlist('location_names[]')}")
+        print("========================")
+        
         if analyzer.schools_df is None:
             flash('No data loaded. Please upload a file first.', 'error')
             return redirect(url_for('index'))
         
         # Get form data
-        school_level = request.form.get('school_level')
+        selected_districts = request.form.getlist('districts')
+        selected_levels = request.form.getlist('school_levels')
         min_distance = float(request.form.get('min_distance', 2.0))
         latitudes = request.form.getlist('latitudes[]')
         longitudes = request.form.getlist('longitudes[]')
         location_names = request.form.getlist('location_names[]')
+        
+        # Validate selections
+        if not selected_districts or not selected_levels:
+            flash('Please select at least one district and one school level.', 'error')
+            return redirect(url_for('configure'))
         
         if not latitudes or not longitudes:
             flash('Please provide at least one coordinate pair.', 'error')
@@ -469,121 +627,160 @@ def analyze():
             return redirect(url_for('configure'))
         
         # Convert coordinates to float and prepare proposals
-        proposals = []
+        base_proposals = []
         for i in range(len(latitudes)):
             try:
-                lat = float(latitudes[i])
-                lng = float(longitudes[i])
-                name = location_names[i] if i < len(location_names) and location_names[i] else f"Proposed Site {i+1}"
+                # Check for empty or None values
+                if not latitudes[i] or not longitudes[i] or latitudes[i].strip() == '' or longitudes[i].strip() == '':
+                    flash(f'Empty coordinates for location {i+1}. Please provide valid latitude and longitude.', 'error')
+                    return redirect(url_for('configure'))
                 
-                proposals.append({
+                lat = float(latitudes[i].strip())
+                lng = float(longitudes[i].strip())
+                
+                # Validate coordinate ranges
+                if not (-90 <= lat <= 90):
+                    flash(f'Invalid latitude {lat} for location {i+1}. Must be between -90 and 90.', 'error')
+                    return redirect(url_for('configure'))
+                
+                if not (-180 <= lng <= 180):
+                    flash(f'Invalid longitude {lng} for location {i+1}. Must be between -180 and 180.', 'error')
+                    return redirect(url_for('configure'))
+                
+                name = location_names[i] if i < len(location_names) and location_names[i] and location_names[i].strip() else f"Proposed Site {i+1}"
+                
+                base_proposals.append({
                     'latitude': lat,
                     'longitude': lng,
-                    'location_name': name,
-                    'school_level': school_level
+                    'name': name
                 })
             except (ValueError, TypeError):
                 flash(f'Invalid coordinates for location {i+1}', 'error')
                 return redirect(url_for('configure'))
         
-        print(f"Analyzing {len(proposals)} proposed locations for {school_level} schools with {min_distance}km minimum distance")
+        print(f"Analyzing {len(base_proposals)} proposed locations for {len(selected_levels)} school levels with {min_distance}km minimum distance")
+        print(f"Selected districts: {selected_districts}")
+        print(f"Selected levels: {selected_levels}")
         
-        # Perform feasibility analysis
-        results = []
-        existing_schools = analyzer.schools_df
+        # Update minimum distance settings if custom value provided
+        if min_distance != 2.0:
+            for level in MIN_DISTANCES:
+                MIN_DISTANCES[level] = min_distance
         
-        # Filter existing schools by level
-        same_level_schools = existing_schools[existing_schools['SchoolLevel'] == school_level]
+        # Determine which districts to use for filtering
+        districts_filter = None if 'all' in selected_districts else selected_districts
         
-        for proposal in proposals:
-            # Validate proposal coordinates
-            if proposal['latitude'] is None or proposal['longitude'] is None:
-                flash(f"Invalid coordinates for {proposal['location_name']}", 'error')
-                return redirect(url_for('configure'))
-                
-            result = {
-                'latitude': float(proposal['latitude']),
-                'longitude': float(proposal['longitude']),
-                'location_name': proposal['location_name'],
-                'feasible': True,
-                'nearest_school': None,
-                'distance_to_nearest': None
-            }
-            
-            # Find nearest school of the same level
-            min_dist = float('inf')
-            nearest_school = None
-            
-            for _, school in same_level_schools.iterrows():
-                # Check if school coordinates are valid
-                if (pd.notna(school['_xCord']) and pd.notna(school['_yCord']) and 
-                    school['_xCord'] is not None and school['_yCord'] is not None):
-                    
-                    try:
-                        # Ensure coordinates are float
-                        school_lat = float(school['_yCord'])
-                        school_lng = float(school['_xCord'])
-                        proposal_lat = float(proposal['latitude'])
-                        proposal_lng = float(proposal['longitude'])
-                        
-                        school_coord = (school_lat, school_lng)
-                        proposal_coord = (proposal_lat, proposal_lng)
-                        
-                        distance = geodesic(proposal_coord, school_coord).kilometers
-                        if distance < min_dist:
-                            min_dist = distance
-                            nearest_school = school.to_dict()
-                    except (ValueError, TypeError, Exception) as e:
-                        print(f"Error calculating distance for school {school.get('SchoolName', 'Unknown')}: {e}")
-                        continue
-            
-            if nearest_school is not None:
-                result['nearest_school'] = {
-                    'School_Name': nearest_school.get('SchoolName', 'Unknown'),
-                    'Level': nearest_school.get('SchoolLevel', 'Unknown'),
-                    'Latitude': nearest_school.get('_yCord'),
-                    'Longitude': nearest_school.get('_xCord')
-                }
-                result['distance_to_nearest'] = min_dist
-                result['feasible'] = min_dist >= min_distance
-            
-            results.append(result)
+        # Determine which levels to analyze
+        levels_to_analyze = analyzer.schools_df['SchoolLevel'].unique().tolist() if 'all' in selected_levels else selected_levels
         
-        # Calculate statistics
-        total_proposed = len(results)
-        feasible_count = sum(1 for r in results if r['feasible'])
+        # Create proposals for each location-level combination
+        all_proposals = []
+        for proposal in base_proposals:
+            for level in levels_to_analyze:
+                all_proposals.append({
+                    'latitude': proposal['latitude'],
+                    'longitude': proposal['longitude'],
+                    'level': level,
+                    'name': f"{proposal['name']} ({level})"
+                })
+        
+        print(f"Generated {len(all_proposals)} total proposals for analysis")
+        
+        # Perform enhanced feasibility analysis
+        all_results = analyzer.analyze_multiple_locations(
+            all_proposals, 
+            search_radius=20, 
+            selected_districts=districts_filter
+        )
+        
+        print(f"Analysis complete. Generated {len(all_results)} results")
+        
+        # Create enhanced map
+        feasibility_map = analyzer.create_feasibility_map(all_results)
+        map_html = feasibility_map._repr_html_() if feasibility_map else None
+        
+        # Calculate enhanced statistics
+        total_proposed = len(all_results)
+        feasible_count = sum(1 for r in all_results if r['is_feasible'])
         not_feasible_count = total_proposed - feasible_count
-        total_existing = len(same_level_schools)
+        highly_recommended = sum(1 for r in all_results if r['recommendation'] == 'HIGHLY RECOMMENDED')
+        recommended = sum(1 for r in all_results if r['recommendation'] == 'RECOMMENDED')
         
-        # Calculate center point for map
-        center_lat = sum(r['latitude'] for r in results) / len(results)
-        center_lng = sum(r['longitude'] for r in results) / len(results)
+        # Risk level distribution
+        risk_levels = {}
+        for result in all_results:
+            risk_level = result['risk_level']
+            risk_levels[risk_level] = risk_levels.get(risk_level, 0) + 1
         
-        # Store results in session for download
+        # School level analysis
+        level_analysis = {}
+        for level in levels_to_analyze:
+            level_results = [r for r in all_results if r['proposed_level'] == level]
+            level_analysis[level] = {
+                'total': len(level_results),
+                'feasible': sum(1 for r in level_results if r['is_feasible']),
+                'avg_conflicts': sum(r['same_level_conflicts'] for r in level_results) / len(level_results) if level_results else 0,
+                'avg_students_nearby': sum(r.get('total_students_nearby', 0) for r in level_results) / len(level_results) if level_results else 0
+            }
+        
+        # Store results in session for download (convert numpy types to native Python types)
+        def convert_numpy_types(obj):
+            """Convert numpy types to native Python types for JSON serialization"""
+            if isinstance(obj, dict):
+                return {key: convert_numpy_types(value) for key, value in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_numpy_types(item) for item in obj]
+            elif hasattr(obj, 'item'):  # numpy scalar
+                return obj.item()
+            elif hasattr(obj, 'tolist'):  # numpy array
+                return obj.tolist()
+            else:
+                return obj
+        
+        # Convert all results to JSON-serializable format
+        serializable_results = convert_numpy_types(all_results)
+        serializable_statistics = convert_numpy_types({
+            'total_proposed': total_proposed,
+            'feasible_count': feasible_count,
+            'not_feasible_count': not_feasible_count,
+            'highly_recommended': highly_recommended,
+            'recommended': recommended,
+            'risk_levels': risk_levels,
+            'level_analysis': level_analysis
+        })
+        
         session['latest_results'] = {
-            'analysis_results': results,
-            'school_level': school_level,
+            'analysis_results': serializable_results,
+            'selected_levels': selected_levels,
+            'selected_districts': selected_districts,
             'min_distance': min_distance,
-            'timestamp': datetime.now().isoformat()
+            'timestamp': datetime.now().isoformat(),
+            'statistics': serializable_statistics
         }
         
         return render_template('results_elegant.html',
-                             results=results,
-                             school_level=school_level,
+                             results=all_results,
+                             school_level=', '.join(levels_to_analyze),
+                             selected_levels=selected_levels,
+                             selected_districts=selected_districts,
                              min_distance=min_distance,
                              feasible_count=feasible_count,
                              not_feasible_count=not_feasible_count,
+                             highly_recommended=highly_recommended,
+                             recommended=recommended,
                              total_proposed=total_proposed,
-                             total_existing=total_existing,
-                             center_lat=center_lat,
-                             center_lng=center_lng,
-                             existing_schools=same_level_schools.to_dict('records'))
+                             risk_levels=risk_levels,
+                             level_analysis=level_analysis,
+                             map_html=map_html,
+                             center_lat=sum(r['latitude'] for r in all_results) / len(all_results) if all_results else 30.0,
+                             center_lng=sum(r['longitude'] for r in all_results) / len(all_results) if all_results else 67.0)
         
     except Exception as e:
-        print(f"Error in analysis: {str(e)}")
+        print(f"Error in analyze route: {str(e)}")
+        print(f"Error type: {type(e)}")
         import traceback
-        traceback.print_exc()
-        flash(f'Analysis error: {str(e)}', 'error')
+        print(f"Traceback: {traceback.format_exc()}")
+        flash(f'Error during analysis: {str(e)}', 'error')
         return redirect(url_for('configure'))
 
 @app.route('/load-sample')
@@ -692,4 +889,4 @@ def health():
     '''
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5011, host='0.0.0.0')
+    app.run(debug=True, port=5012, host='0.0.0.0')

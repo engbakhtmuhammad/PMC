@@ -1,0 +1,16 @@
+SchoolName,District,CurrentLevel,RecommendedProgression,Gender,Priority,Target_School_Latitude,Target_School_Longitude,Total_Progression_Schools_Found,Analysis_Message,Nearest_Progression_School,Distance_to_Nearest_KM,Progression_School_District
+Government Primary School Quetta Central,Quetta,Primary,Middle,Boys,High,30.1798,67.0011,2,Found 2 Middle schools within 20.0km,Private Middle School Quetta Excellence,1.75,Quetta
+Government Primary School Kalat Town,Kalat,Primary,Middle,Boys,High,29.0265,66.5946,1,Found 1 Middle schools within 20.0km,Government Middle School Kalat Center,0.54,Kalat
+Government Middle School Ziarat Hills,Ziarat,Middle,High,Girls,High,30.3855,67.731,1,Found 1 High schools within 20.0km,Government High School Ziarat Center,0.22,Ziarat
+Government Primary School Pishin North,Pishin,Primary,Middle,Boys,High,30.5823,66.9947,1,Found 1 Middle schools within 20.0km,Government Middle School Pishin Central,0.31,Pishin
+Government Middle School Killa Saifullah West,Killa Saifullah,Middle,High,Girls,High,31.0512,68.7444,1,Found 1 High schools within 20.0km,Government High School Killa Saifullah Center,0.15,Killa Saifullah
+Government High School Quetta East,Quetta,High,Higher Secondary,Boys,High,30.1846,67.0246,1,Found 1 Higher Secondary schools within 20.0km,Government Higher Secondary School Quetta,0.92,Quetta
+Private Primary School Quetta Model,Quetta,Primary,Middle,Boys,High,30.1825,67.0095,2,Found 2 Middle schools within 20.0km,Private Middle School Quetta Excellence,1.01,Quetta
+Government Primary School Mastung Road,Mastung,Primary,Middle,Boys,High,29.7995,66.8446,1,Found 1 Middle schools within 20.0km,Government Middle School Mastung Center,0.29,Mastung
+Government Middle School Nushki Central,Nushki,Middle,High,Girls,High,29.5552,65.9984,1,Found 1 High schools within 20.0km,Government High School Nushki North,0.15,Nushki
+Government Primary School Chaman Border,Chaman,Primary,Middle,Boys,High,30.9226,66.4507,1,Found 1 Middle schools within 20.0km,Government Middle School Chaman Center,0.29,Chaman
+Government Middle School Loralai West,Loralai,Middle,High,Girls,Medium,30.3693,68.5955,1,Found 1 High schools within 20.0km,Government High School Loralai Center,0.15,Loralai
+Government Primary School Zhob Valley,Zhob,Primary,Middle,Boys,Medium,31.3416,69.4496,1,Found 1 Middle schools within 20.0km,Government Middle School Zhob Hills,0.29,Zhob
+Government High School Sibi Center,Sibi,High,Higher Secondary,Boys,Medium,29.5479,67.8772,0,Found 0 Higher Secondary schools within 20.0km,,,
+Government Primary School Dera Bugti North,Dera Bugti,Primary,Middle,Boys,Medium,29.0346,69.1595,1,Found 1 Middle schools within 20.0km,Government Middle School Dera Bugti South,0.3,Dera Bugti
+Government Middle School Kohlu Valley,Kohlu,Middle,High,Girls,Medium,29.8952,69.2553,1,Found 1 High schools within 20.0km,Government High School Kohlu Main,0.15,Kohlu

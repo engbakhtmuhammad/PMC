@@ -1,0 +1,52 @@
+School_Name,Latitude,Longitude,District,Level,Type,Gender
+Government Primary School Quetta Central,30.1798,67.0011,Quetta,Primary,Government,Boys
+Government Middle School Quetta North,30.1995,67.0183,Quetta,Middle,Government,Girls
+Government High School Quetta East,30.1846,67.0246,Quetta,High,Government,Boys
+Government Higher Secondary School Quetta,30.1875,67.0156,Quetta,Higher Secondary,Government,Girls
+Government Primary School Kalat Town,29.0265,66.5946,Kalat,Primary,Government,Boys
+Government Middle School Kalat Center,29.0245,66.5896,Kalat,Middle,Government,Girls
+Government High School Kalat Main,29.0225,66.5866,Kalat,High,Government,Boys
+Government Primary School Ziarat Valley,30.3822,67.7275,Ziarat,Primary,Government,Boys
+Government Middle School Ziarat Hills,30.3855,67.7310,Ziarat,Middle,Government,Girls
+Government High School Ziarat Center,30.3845,67.7290,Ziarat,High,Government,Boys
+Government Primary School Pishin North,30.5823,66.9947,Pishin,Primary,Government,Boys
+Government Middle School Pishin Central,30.5845,66.9967,Pishin,Middle,Government,Girls
+Government High School Pishin South,30.5835,66.9957,Pishin,High,Government,Boys
+Government Primary School Killa Saifullah East,31.0532,68.7464,Killa Saifullah,Primary,Government,Boys
+Government Middle School Killa Saifullah West,31.0512,68.7444,Killa Saifullah,Middle,Government,Girls
+Government High School Killa Saifullah Center,31.0522,68.7454,Killa Saifullah,High,Government,Boys
+Private Primary School Quetta Model,30.1825,67.0095,Quetta,Primary,Private,Boys
+Private Middle School Quetta Excellence,30.1905,67.0145,Quetta,Middle,Private,Girls
+Private High School Quetta Elite,30.1885,67.0125,Quetta,High,Private,Boys
+Government Primary School Mastung Road,29.7995,66.8446,Mastung,Primary,Government,Boys
+Government Middle School Mastung Center,29.8015,66.8466,Mastung,Middle,Government,Girls
+Government High School Mastung Main,29.8005,66.8456,Mastung,High,Government,Boys
+Government Primary School Nushki Town,29.5532,65.9964,Nushki,Primary,Government,Boys
+Government Middle School Nushki Central,29.5552,65.9984,Nushki,Middle,Government,Girls
+Government High School Nushki North,29.5542,65.9974,Nushki,High,Government,Boys
+Government Primary School Chaman Border,30.9226,66.4507,Chaman,Primary,Government,Boys
+Government Middle School Chaman Center,30.9246,66.4527,Chaman,Middle,Government,Girls
+Government High School Chaman Main,30.9236,66.4517,Chaman,High,Government,Boys
+Government Higher Secondary School Chaman,30.9256,66.4537,Chaman,Higher Secondary,Government,Girls
+Government Primary School Loralai East,30.3713,68.5975,Loralai,Primary,Government,Boys
+Government Middle School Loralai West,30.3693,68.5955,Loralai,Middle,Government,Girls
+Government High School Loralai Center,30.3703,68.5965,Loralai,High,Government,Boys
+Government Primary School Zhob Valley,31.3416,69.4496,Zhob,Primary,Government,Boys
+Government Middle School Zhob Hills,31.3436,69.4516,Zhob,Middle,Government,Girls
+Government High School Zhob Center,31.3426,69.4506,Zhob,High,Government,Boys
+Government Higher Secondary School Zhob,31.3446,69.4526,Zhob,Higher Secondary,Government,Girls
+Government Primary School Sibi East,29.5489,67.8782,Sibi,Primary,Government,Boys
+Government Middle School Sibi West,29.5469,67.8762,Sibi,Middle,Government,Girls
+Government High School Sibi Center,29.5479,67.8772,Sibi,High,Government,Boys
+Government Primary School Dera Bugti North,29.0346,69.1595,Dera Bugti,Primary,Government,Boys
+Government Middle School Dera Bugti South,29.0326,69.1575,Dera Bugti,Middle,Government,Girls
+Government High School Dera Bugti Center,29.0336,69.1585,Dera Bugti,High,Government,Boys
+Government Primary School Kohlu Hills,29.8932,69.2533,Kohlu,Primary,Government,Boys
+Government Middle School Kohlu Valley,29.8952,69.2553,Kohlu,Middle,Government,Girls
+Government High School Kohlu Main,29.8942,69.2543,Kohlu,High,Government,Boys
+Government Primary School Barkhan East,29.8946,69.5265,Barkhan,Primary,Government,Boys
+Government Middle School Barkhan West,29.8926,69.5245,Barkhan,Middle,Government,Girls
+Government High School Barkhan Center,29.8936,69.5255,Barkhan,High,Government,Boys
+Government Primary School Musakhel North,30.8643,69.8764,Musakhel,Primary,Government,Boys
+Government Middle School Musakhel South,30.8623,69.8744,Musakhel,Middle,Government,Girls
+Government High School Musakhel Center,30.8633,69.8754,Musakhel,High,Government,Boys
