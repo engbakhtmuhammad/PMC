@@ -442,6 +442,7 @@
         .checkbox-group {
             display: grid;
             gap: 0.75rem;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
         }
 
         .checkbox-item {
@@ -455,6 +456,17 @@
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
+            margin: 0;
+        }
+
+        .checkbox-item strong {
+            font-size: 0.78rem;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .checkbox-item .text-muted.small {
+            font-size: 0.65rem;
         }
 
         .checkbox-item:hover {
@@ -499,6 +511,7 @@
         .checkbox-item.selected {
             border-color: var(--primary-color);
             background: rgba(37, 99, 235, 0.1);
+            box-shadow: 0 0 0 1px #2563eb33;
         }
 
         /* Responsive Design */
@@ -594,68 +607,77 @@
                     <input type="hidden" name="filename" value="{{ filename }}">
                     
                     <!-- School Level Selection -->
-                    <div class="form-group-elegant">
-                        <label class="form-label-elegant">
-                            <i class="fas fa-graduation-cap text-primary"></i>
-                            Proposed School Level Selection
-                        </label>
-                        <div class="checkbox-group mb-3">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="all_levels" name="school_levels" value="all" checked>
-                                <span class="checkmark"></span>
-                                <div>
-                                    <strong>All School Levels</strong>
-                                    <div class="text-muted small">Analyze for all education levels</div>
+                    <div class="selection-grid">
+                        <div class="card-elegant level-card">
+                            <div class="card-body-elegant" style="padding:2rem;">
+                                <div class="form-group-elegant mb-0">
+                                    <label class="form-label-elegant">
+                                        <i class="fas fa-graduation-cap text-primary"></i>
+                                        Proposed School Level Selection
+                                    </label>
+                                    <div class="checkbox-group mb-3">
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="all_levels" name="school_levels" value="all" checked>
+                                            <span class="checkmark"></span>
+                                            <div>
+                                                <strong>All School Levels</strong>
+                                                <div class="text-muted small">Analyze for all education levels</div>
+                                            </div>
+                                        </div>
+                                        {% for level in available_levels %}
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" name="school_levels" value="{{ level }}" class="level-checkbox">
+                                            <span class="checkmark"></span>
+                                            <div>
+                                                <strong>{{ level }} School</strong>
+                                                <div class="text-muted small">{{ level_counts.get(level, 0) }} existing schools</div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="form-text mt-2">
+                                        <i class="fas fa-info-circle text-info"></i>
+                                        The system will check feasibility based on proximity to existing schools of selected levels.
+                                    </div>
                                 </div>
                             </div>
-                            {% for level in available_levels %}
-                            <div class="checkbox-item">
-                                <input type="checkbox" name="school_levels" value="{{ level }}" class="level-checkbox">
-                                <span class="checkmark"></span>
-                                <div>
-                                    <strong>{{ level }} School</strong>
-                                    <div class="text-muted small">{{ level_counts.get(level, 0) }} existing schools</div>
-                                </div>
-                            </div>
-                            {% endfor %}
                         </div>
-                        <div class="form-text mt-2">
-                            <i class="fas fa-info-circle text-info"></i>
-                            The system will check feasibility based on proximity to existing schools of selected levels.
+                        <div class="card-elegant district-card">
+                            <div class="card-body-elegant" style="padding:2rem;">
+                                <div class="form-group-elegant mb-0">
+                                    <label class="form-label-elegant">
+                                        <i class="fas fa-map-marker-alt text-primary"></i>
+                                        District Selection
+                                    </label>
+                                    <div class="checkbox-group mb-3">
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" id="all_districts" name="districts" value="all" checked>
+                                            <span class="checkmark"></span>
+                                            <div>
+                                                <strong>All Districts</strong>
+                                                <div class="text-muted small">Include all available districts</div>
+                                            </div>
+                                        </div>
+                                        {% for district in available_districts %}
+                                        <div class="checkbox-item">
+                                            <input type="checkbox" name="districts" value="{{ district }}" class="district-checkbox">
+                                            <span class="checkmark"></span>
+                                            <div>
+                                                <strong>{{ district }}</strong>
+                                                <div class="text-muted small">{{ district_counts.get(district, 0) }} schools</div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="form-text mt-2">
+                                        <i class="fas fa-info-circle text-info"></i>
+                                        Filter existing schools by district for more focused analysis.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- District Filter -->
-                    <div class="form-group-elegant">
-                        <label class="form-label-elegant">
-                            <i class="fas fa-map-marker-alt text-primary"></i>
-                            District Selection
-                        </label>
-                        <div class="checkbox-group mb-3">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="all_districts" name="districts" value="all" checked>
-                                <span class="checkmark"></span>
-                                <div>
-                                    <strong>All Districts</strong>
-                                    <div class="text-muted small">Include all available districts</div>
-                                </div>
-                            </div>
-                            {% for district in available_districts %}
-                            <div class="checkbox-item">
-                                <input type="checkbox" name="districts" value="{{ district }}" class="district-checkbox">
-                                <span class="checkmark"></span>
-                                <div>
-                                    <strong>{{ district }}</strong>
-                                    <div class="text-muted small">{{ district_counts.get(district, 0) }} schools</div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        <div class="form-text mt-2">
-                            <i class="fas fa-info-circle text-info"></i>
-                            Filter existing schools by district for more focused analysis.
-                        </div>
-                    </div>
+                    <!-- End grid -->
 
                     <!-- Minimum Distance Configuration -->
                     <div class="form-group-elegant">

@@ -275,8 +275,7 @@ class SchoolProgressionAnalyzer:
         return 6371.0 * c  # Earth radius km
     
     def find_progression_schools(self, target_school, max_distance=MAX_SEARCH_RADIUS):
-        """Find the nearest progression schools for a target school with gender filtering.
-        Returns ALL matching progression schools within radius sorted by distance."""
+        """Find the nearest progression schools for a target school"""
         # Optimized version using pre-built indices
         if self.all_schools_df is None:
             return None
@@ -285,8 +284,8 @@ class SchoolProgressionAnalyzer:
         target_level = target_school['SchoolLevel']
         target_lat = target_school['_yCord']
         target_lon = target_school['_xCord']
-        target_gender = str(target_school.get('Gender', '')).strip().lower()
         progression_level = PROGRESSION_MAP.get(target_level)
+        
         if progression_level is None:
             return {
                 'target_school': target_school.to_dict(),
@@ -295,6 +294,7 @@ class SchoolProgressionAnalyzer:
                 'nearest_schools': [],
                 'total_found': 0
             }
+        
         if progression_level not in self.level_index:
             return {
                 'target_school': target_school.to_dict(),
@@ -303,18 +303,13 @@ class SchoolProgressionAnalyzer:
                 'nearest_schools': [],
                 'total_found': 0
             }
+        
         prog_df = self.level_index[progression_level]
         lats, lons = self.level_coords[progression_level]
-        # Gender filtering rules: if target is boys -> only boys; if girls -> only girls; else (mixed/other) keep all
-        if target_gender.startswith('boy'):
-            gender_mask_global = prog_df['Gender'].astype(str).str.lower().str.startswith('boy')
-        elif target_gender.startswith('girl'):
-            gender_mask_global = prog_df['Gender'].astype(str).str.lower().str.startswith('girl')
-        else:
-            gender_mask_global = pd.Series([True] * len(prog_df), index=prog_df.index)
-        # Bounding box pre-filter
+        # Bounding box pre-filter to reduce computation
         lat_delta = max_distance / 111.0
         lon_delta = max_distance / (111.0 * max(cos(radians(target_lat)), 0.1))
+        # Fixed multiline boolean expression with explicit parentheses
         mask_bbox = (
             (lats >= target_lat - lat_delta) &
             (lats <= target_lat + lat_delta) &
@@ -331,22 +326,8 @@ class SchoolProgressionAnalyzer:
                 'total_found': 0,
                 'all_within_radius': 0
             }
-        # Apply gender mask inside bbox
-        bbox_indices = np.nonzero(mask_bbox)[0]
-        gender_mask_bbox = gender_mask_global.iloc[bbox_indices].to_numpy()
-        if not np.any(gender_mask_bbox):
-            return {
-                'target_school': target_school.to_dict(),
-                'current_level': target_level,
-                'progression_level': progression_level,
-                'message': f"No gender-matching {progression_level} schools within {max_distance}km",
-                'nearest_schools': [],
-                'total_found': 0,
-                'all_within_radius': 0
-            }
-        subset_indices_gender = bbox_indices[gender_mask_bbox]
-        subset_lats = lats[subset_indices_gender]
-        subset_lons = lons[subset_indices_gender]
+        subset_lats = lats[mask_bbox]
+        subset_lons = lons[mask_bbox]
         distances = self.haversine_vectorized(target_lat, target_lon, subset_lats, subset_lons)
         within_mask = distances <= max_distance
         if not np.any(within_mask):
@@ -354,26 +335,29 @@ class SchoolProgressionAnalyzer:
                 'target_school': target_school.to_dict(),
                 'current_level': target_level,
                 'progression_level': progression_level,
-                'message': f"No gender-matching {progression_level} schools within {max_distance}km",
+                'message': f"No {progression_level} schools within {max_distance}km",
                 'nearest_schools': [],
                 'total_found': 0,
                 'all_within_radius': 0
             }
-        # Indices relative to full prog_df after gender + bbox filtering
-        final_indices = subset_indices_gender[within_mask]
-        final_distances = distances[within_mask]
-        order = np.argsort(final_distances)
-        ordered_indices = final_indices[order]
-        ordered_distances = final_distances[order]
-        full_df = prog_df.iloc[ordered_indices].copy()
-        full_df['distance_km'] = np.round(ordered_distances, 4)
+        # Indices relative to full prog_df
+        subset_indices = np.nonzero(mask_bbox)[0][within_mask]
+        subset_distances = distances[within_mask]
+        order = np.argsort(subset_distances)
+        ordered_indices = subset_indices[order]
+        ordered_distances = subset_distances[order]
+        top_n = 5
+        take_indices = ordered_indices[:top_n]
+        take_distances = ordered_distances[:top_n]
+        top_df = prog_df.iloc[take_indices].copy()
+        top_df['distance_km'] = np.round(take_distances, 4)
         result_total = len(ordered_indices)
         return {
             'target_school': target_school.to_dict(),
             'current_level': target_level,
             'progression_level': progression_level,
-            'message': f"Found {result_total} gender-matching {progression_level} schools within {max_distance}km",
-            'nearest_schools': full_df.to_dict('records'),  # ALL matching schools
+            'message': f"Found {result_total} {progression_level} schools within {max_distance}km",
+            'nearest_schools': top_df.to_dict('records'),
             'total_found': result_total,
             'all_within_radius': result_total
         }
@@ -800,9 +784,6 @@ def download_results():
         df_results = []
         for i, result in enumerate(results['progression_results']):
             target = result['target_school']
-            # Skip targets with no matching progression schools
-            if result.get('total_found', 0) == 0:
-                continue
             row = {
                 'Target_BEMIS_Code': target.get('BEMISCode',''),
                 'SchoolName': target['SchoolName'],
@@ -820,7 +801,7 @@ def download_results():
                 'Distance_to_Nearest_KM': '',
                 'Progression_School_District': ''
             }
-            if result.get('nearest_schools'):
+            if result.get('nearest_schools') and len(result['nearest_schools']) > 0:
                 nearest = result['nearest_schools'][0]
                 row.update({
                     'Nearest_Progression_School': nearest.get('SchoolName',''),
@@ -829,9 +810,6 @@ def download_results():
                     'Progression_School_District': nearest.get('District', 'Unknown')
                 })
             df_results.append(row)
-        # If no rows (no matches at all), still create an empty file with headers
-        if not df_results:
-            df_results.append({k: '' for k in ['Target_BEMIS_Code','SchoolName','District','CurrentLevel','RecommendedProgression','Gender','Priority','Target_School_Latitude','Target_School_Longitude','Total_Progression_Schools_Found','Analysis_Message','Nearest_Progression_School','Nearest_Progression_BEMIS_Code','Distance_to_Nearest_KM','Progression_School_District']})
         df = pd.DataFrame(df_results)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"school_progression_analysis_{timestamp}.csv"
