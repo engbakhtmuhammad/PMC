@@ -400,14 +400,19 @@ class SchoolProgressionAnalyzer:
         center_lon = sum(target_lons) / len(target_lons)
         
         # Create map
-        m = folium.Map(
-            location=[center_lat, center_lon], 
-            zoom_start=8,
-            tiles=None,
-            max_zoom=18,
-            min_zoom=5
-        )
-        
+        try:
+            m = folium.Map(
+                location=[center_lat, center_lon], 
+                zoom_start=8,
+                tiles=None,
+                max_zoom=18,
+                min_zoom=5
+            )
+        except Exception as map_err:
+            print(f"Folium map creation failed: {map_err}")
+            return None
+        # Ensure Leaflet assets injection for inline rendering
+        folium.utilities.validate_location
         # Add tile layers
         folium.TileLayer(
             tiles='OpenStreetMap',

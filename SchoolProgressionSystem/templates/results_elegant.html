@@ -748,8 +748,14 @@
                     </div>
                 </div>
                 {% if map_html %}
-                <iframe id="mapFrame" class="map-frame" srcdoc="{{ map_html | safe }}" title="Progression Map"></iframe>
-                <div class="text-muted small mt-2">If map tiles do not appear, refresh the page; ensure internet access for tile servers.</div>
+                <div id="mapContainer" class="map-frame" style="padding:0;overflow:hidden;">
+                    {{ map_html | safe }}
+                </div>
+                <style>
+                    #mapContainer .folium-map {width:100% !important; height:100% !important;}
+                    #mapContainer iframe {width:100% !important; height:100% !important; border:0;}
+                </style>
+                <div class="text-muted small mt-2">If map tiles do not appear, ensure internet access; this inline map replaces prior iframe embedding.</div>
                 {% else %}
                 <div class="text-center py-5">
                     <i class="fas fa-map text-muted" style="font-size: 3rem;"></i>
