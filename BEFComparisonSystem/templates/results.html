@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - BEF-Government Schools Comparison</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #0891b2;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --purple-color: #7c3aed;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--gradient-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            padding: 2rem 0;
+            min-height: 100vh;
+        }
+
+        .header-section {
+            text-align: center;
+            padding: 2rem 0;
+            color: white;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .card-elegant {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .stats-section {
+            padding: 2.5rem;
+        }
+
+        .stats-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            background: var(--gradient-primary);
+        }
+
+        .stats-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .stats-description {
+            color: #64748b;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-sublabel {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        .map-section {
+            padding: 2rem;
+            background: #f8fafc;
+        }
+
+        .map-container {
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 8px 25px -5px rgb(0 0 0 / 0.1);
+            background: white;
+            min-height: 600px;
+            position: relative;
+        }
+
+        .map-content {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 1rem;
+        }
+
+        .district-analysis {
+            padding: 2.5rem;
+        }
+
+        .district-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .district-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .district-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        .district-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .district-name {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 1.1rem;
+        }
+
+        .district-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .district-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .district-stat {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .district-stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .district-stat-label {
+            color: #6b7280;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        .analysis-insights {
+            padding: 2.5rem;
+            background: rgba(15, 23, 42, 0.05);
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .insight-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .insight-title {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-text {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .insight-highlight {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .actions-section {
+            padding: 2rem;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.05);
+        }
+
+        .btn-elegant {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            margin: 0.5rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-elegant:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background: #047857;
+            color: white;
+        }
+
+        .proximity-chart {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 1rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .chart-header {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .proximity-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .proximity-label {
+            width: 120px;
+            font-size: 0.9rem;
+            color: #6b7280;
+            text-align: right;
+        }
+
+        .proximity-progress {
+            flex: 1;
+            background: #f3f4f6;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .proximity-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        .proximity-value {
+            width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            color: #6b7280;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container main-container">
+        <!-- Header Section -->
+        <div class="header-section" data-aos="fade-down">
+            <h1 class="header-title">
+                <i class="fas fa-chart-line me-3"></i>
+                Analysis Results
+            </h1>
+            <p class="header-subtitle">
+                Comprehensive comparison between BEF and Government schools
+            </p>
+        </div>
+
+        <!-- Overall Statistics -->
+        <div class="card-elegant" data-aos="fade-up">
+            <div class="stats-section">
+                <div class="stats-header">
+                    <div class="stats-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div>
+                        <h3 class="stats-title">Overall Statistics</h3>
+                        <p class="stats-description">Key metrics from your analysis</p>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ stats.total_govt_schools }}</div>
+                        <div class="stat-label">Government Schools</div>
+                        <div class="stat-sublabel">Total in dataset</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value">{{ stats.total_bef_schools }}</div>
+                        <div class="stat-label">BEF Schools</div>
+                        <div class="stat-sublabel">Total in dataset</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value">{{ stats.districts_analyzed }}</div>
+                        <div class="stat-label">Districts Analyzed</div>
+                        <div class="stat-sublabel">Selected for comparison</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value">{{ "%.1f"|format(stats.avg_distance) }} km</div>
+                        <div class="stat-label">Average Distance</div>
+                        <div class="stat-sublabel">BEF to nearest Govt school</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value">{{ stats.schools_within_threshold }}</div>
+                        <div class="stat-label">Within {{ max_distance }} km</div>
+                        <div class="stat-sublabel">BEF schools near Govt schools</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value">{{ "%.1f"|format(stats.coverage_percentage) }}%</div>
+                        <div class="stat-label">Coverage Rate</div>
+                        <div class="stat-sublabel">BEF schools with nearby Govt schools</div>
+                    </div>
+                </div>
+
+                <!-- Proximity Distribution Chart -->
+                <div class="proximity-chart">
+                    <div class="chart-header">Proximity Distribution</div>
+                    {% for range_data in proximity_distribution %}
+                    <div class="proximity-bar">
+                        <div class="proximity-label">{{ range_data.range }}</div>
+                        <div class="proximity-progress">
+                            <div class="proximity-fill" data-width="{{ range_data.percentage }}"></div>
+                        </div>
+                        <div class="proximity-value">{{ range_data.count }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Map -->
+        {% if include_map %}
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="100">
+            <div class="stats-section">
+                <div class="stats-header">
+                    <div class="stats-icon">
+                        <i class="fas fa-map"></i>
+                    </div>
+                    <div>
+                        <h3 class="stats-title">Interactive Map</h3>
+                        <p class="stats-description">Geographic distribution and proximity analysis</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="map-section">
+                <div class="map-container">
+                    {% if map_html %}
+                        {{ map_html|safe }}
+                    {% else %}
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                            <p>Loading interactive map...</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- District Analysis -->
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="200">
+            <div class="district-analysis">
+                <div class="stats-header">
+                    <div class="stats-icon">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div>
+                        <h3 class="stats-title">District-wise Analysis</h3>
+                        <p class="stats-description">Detailed breakdown by district</p>
+                    </div>
+                </div>
+
+                <div class="district-grid">
+                    {% for district in district_analysis %}
+                    <div class="district-card">
+                        <div class="district-header">
+                            <div class="district-name">{{ district.name }}</div>
+                            <div class="district-badge">{{ district.bef_schools }} BEF Schools</div>
+                        </div>
+                        
+                        <div class="district-stats">
+                            <div class="district-stat">
+                                <div class="district-stat-value">{{ district.govt_schools }}</div>
+                                <div class="district-stat-label">Govt Schools</div>
+                            </div>
+                            
+                            <div class="district-stat">
+                                <div class="district-stat-value">{{ "%.1f"|format(district.avg_distance) }} km</div>
+                                <div class="district-stat-label">Avg Distance</div>
+                            </div>
+                            
+                            <div class="district-stat">
+                                <div class="district-stat-value">{{ district.within_threshold }}</div>
+                                <div class="district-stat-label">Within {{ max_distance }} km</div>
+                            </div>
+                            
+                            <div class="district-stat">
+                                <div class="district-stat-value">{{ "%.1f"|format(district.coverage) }}%</div>
+                                <div class="district-stat-label">Coverage</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Insights -->
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="300">
+            <div class="analysis-insights">
+                <div class="stats-header">
+                    <div class="stats-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div>
+                        <h3 class="stats-title">Key Insights</h3>
+                        <p class="stats-description">Automated analysis and recommendations</p>
+                    </div>
+                </div>
+
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h4 class="insight-title">Coverage Analysis</h4>
+                        <p class="insight-text">
+                            <span class="insight-highlight">{{ "%.1f"|format(stats.coverage_percentage) }}%</span> 
+                            of BEF schools are within {{ max_distance }} km of a government school. 
+                            {% if stats.coverage_percentage > 75 %}
+                                This indicates excellent accessibility to government educational infrastructure.
+                            {% elif stats.coverage_percentage > 50 %}
+                                This shows good proximity to government schools with room for improvement.
+                            {% else %}
+                                This suggests many BEF schools are in underserved areas with limited government school access.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+                        <h4 class="insight-title">Distance Patterns</h4>
+                        <p class="insight-text">
+                            The average distance from BEF schools to the nearest government school is 
+                            <span class="insight-highlight">{{ "%.1f"|format(stats.avg_distance) }} km</span>. 
+                            {% if stats.avg_distance < 5 %}
+                                This suggests BEF schools are well-integrated with existing government infrastructure.
+                            {% elif stats.avg_distance < 15 %}
+                                This indicates moderate proximity with manageable transportation distances.
+                            {% else %}
+                                This suggests BEF schools are serving areas with limited government school coverage.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-icon">
+                            <i class="fas fa-chart-area"></i>
+                        </div>
+                        <h4 class="insight-title">Geographic Distribution</h4>
+                        <p class="insight-text">
+                            Analysis across <span class="insight-highlight">{{ stats.districts_analyzed }}</span> districts shows 
+                            varying levels of school density and accessibility. 
+                            {% if district_analysis %}
+                                {{ district_analysis[0].name }} shows the highest concentration with 
+                                {{ district_analysis[0].bef_schools }} BEF schools.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h4 class="insight-title">Service Complementarity</h4>
+                        <p class="insight-text">
+                            The relationship between BEF and government schools suggests 
+                            {% if stats.coverage_percentage > 60 %}
+                                complementary service provision, with BEF schools enhancing educational access in areas 
+                                already served by government infrastructure.
+                            {% else %}
+                                gap-filling service provision, with BEF schools primarily serving areas with 
+                                limited government school coverage.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card-elegant" data-aos="fade-up" data-aos-delay="400">
+            <div class="actions-section">
+                <h4 class="mb-4">Next Steps</h4>
+                
+                {% if include_download %}
+                <a href="/download_results" class="btn-elegant btn-success">
+                    <i class="fas fa-download me-2"></i>
+                    Download Detailed Results
+                </a>
+                {% endif %}
+                
+                <a href="/configure" class="btn-elegant">
+                    <i class="fas fa-redo me-2"></i>
+                    Run New Analysis
+                </a>
+                
+                <a href="/" class="btn-elegant btn-secondary">
+                    <i class="fas fa-home me-2"></i>
+                    Start Over
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic',
+            once: true
+        });
+
+        // Animate proximity chart on load
+                document.addEventListener('DOMContentLoaded', function() {
+                    const proximityFills = document.querySelectorAll('.proximity-fill[data-width]');
+                    
+                    // Delay animation for better effect
+                    setTimeout(() => {
+                        proximityFills.forEach((fill, index) => {
+                            const targetWidth = fill.getAttribute('data-width') + '%';
+                            fill.style.width = '0%';
+                            setTimeout(() => {
+                                fill.style.width = targetWidth;
+                            }, index * 200);
+                        });
+                    }, 500);
+                });
+
+        // Auto-refresh map if it's loading
+        function checkMapStatus() {
+            const mapContainer = document.querySelector('.map-container');
+            const loadingContainer = mapContainer?.querySelector('.loading-container');
+            
+            if (loadingContainer) {
+                // Check if map is ready
+                fetch('/map_status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ready) {
+                        location.reload();
+                    }
+                })
+                .catch(error => console.log('Map status check failed'));
+            }
+        }
+
+        // Check map status every 3 seconds if loading
+        const mapStatusInterval = setInterval(checkMapStatus, 3000);
+        
+        // Clear interval after 30 seconds
+        setTimeout(() => {
+            clearInterval(mapStatusInterval);
+        }, 30000);
+    </script>
+</body>
+</html>
