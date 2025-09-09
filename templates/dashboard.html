@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMC School Management Systems Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .system-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .system-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        .system-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .status-badge {
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+        }
+        
+        .status-running {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .status-stopped {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .stats-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .feature-tag {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            margin: 0.25rem;
+            display: inline-block;
+        }
+        
+        .btn-custom {
+            border-radius: 25px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-start {
+            background: var(--success-color);
+            border: none;
+            color: white;
+        }
+        
+        .btn-start:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+        
+        .btn-stop {
+            background: var(--danger-color);
+            border: none;
+            color: white;
+        }
+        
+        .btn-stop:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-access {
+            background: var(--secondary-color);
+            border: none;
+            color: white;
+        }
+        
+        .btn-access:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .dashboard-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .dashboard-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            margin-bottom: 0;
+        }
+        
+        .auto-refresh {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="auto-refresh">
+        <i class="bi bi-arrow-clockwise"></i>
+        Auto-refresh: <span id="countdown">30</span>s
+    </div>
+
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="dashboard-title">🏛️ PMC School Management Systems</h1>
+                    <p class="dashboard-subtitle">Balochistan Education Foundation - Unified Dashboard</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <small class="text-white-50">Last Updated: {{ stats.last_updated }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Statistics Row -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-number">{{ stats.total_systems }}</div>
+                    <div class="text-muted">Total Systems</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-number text-success">{{ stats.running_systems }}</div>
+                    <div class="text-muted">Running Systems</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <div class="stats-number text-danger">{{ stats.total_systems - stats.running_systems }}</div>
+                    <div class="text-muted">Stopped Systems</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Systems Grid -->
+        <div class="row">
+            {% for system_id, system in systems.items() %}
+            <div class="col-lg-6 col-xl-6 mb-4">
+                <div class="system-card">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="system-icon">{{ system.icon }}</span>
+                            <h4 class="mb-1">{{ system.name }}</h4>
+                        </div>
+                        <span class="status-badge status-{{ system.status }}" id="status-{{ system_id }}">
+                            <i class="bi bi-circle-fill"></i> {{ system.status.title() }}
+                        </span>
+                    </div>
+                    
+                    <p class="text-muted mb-3">{{ system.description }}</p>
+                    
+                    <div class="mb-3">
+                        <strong>Features:</strong><br>
+                        {% for feature in system.features %}
+                        <span class="feature-tag">{{ feature }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="bi bi-globe"></i> Port: {{ system.port }} | 
+                            <i class="bi bi-folder"></i> Path: {{ system.path }}
+                        </small>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        {% if system.status == 'running' %}
+                        <button class="btn btn-stop btn-custom" onclick="stopSystem('{{ system_id }}')">
+                            <i class="bi bi-stop-circle"></i> Stop
+                        </button>
+                        <a href="http://localhost:{{ system.port }}" target="_blank" 
+                           class="btn btn-access btn-custom">
+                            <i class="bi bi-box-arrow-up-right"></i> Access
+                        </a>
+                        {% else %}
+                        <button class="btn btn-start btn-custom" onclick="startSystem('{{ system_id }}')">
+                            <i class="bi bi-play-circle"></i> Start
+                        </button>
+                        {% endif %}
+                        <a href="/system/{{ system_id }}" class="btn btn-outline-secondary btn-custom">
+                            <i class="bi bi-info-circle"></i> Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function startSystem(systemId) {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass"></i> Starting...';
+            
+            fetch(`/start_system/${systemId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        updateSystemStatus(systemId, 'running');
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                })
+                .catch(error => {
+                    alert('Error starting system: ' + error);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                });
+        }
+        
+        function stopSystem(systemId) {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass"></i> Stopping...';
+            
+            fetch(`/stop_system/${systemId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        updateSystemStatus(systemId, 'stopped');
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                })
+                .catch(error => {
+                    alert('Error stopping system: ' + error);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                });
+        }
+        
+        function updateSystemStatus(systemId, status) {
+            const statusBadge = document.getElementById(`status-${systemId}`);
+            if (statusBadge) {
+                statusBadge.className = `status-badge status-${status}`;
+                statusBadge.innerHTML = `<i class="bi bi-circle-fill"></i> ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+            }
+        }
+        
+        // Auto-refresh functionality
+        let countdown = 30;
+        setInterval(() => {
+            countdown--;
+            document.getElementById('countdown').textContent = countdown;
+            
+            if (countdown <= 0) {
+                location.reload();
+            }
+        }, 1000);
+        
+        // Update system statuses periodically
+        setInterval(() => {
+            fetch('/api/stats')
+                .then(response => response.json())
+                .then(data => {
+                    Object.keys(data.systems).forEach(systemId => {
+                        updateSystemStatus(systemId, data.systems[systemId]);
+                    });
+                })
+                .catch(error => console.error('Error updating stats:', error));
+        }, 10000);
+    </script>
+</body>
+</html>

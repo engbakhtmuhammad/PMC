@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-WSGI entry point for Render deployment
+WSGI entry point for PMC Dashboard deployment
 """
 import os
 import sys
 
-# Add the BEFComparisonSystem directory to the Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'BEFComparisonSystem'))
+# Add the current directory to the Python path
+sys.path.insert(0, os.path.dirname(__file__))
 
-# Import the Flask app
-from app import app
+# Import the Flask app from dashboard
+from dashboard_app import app
 
 # WSGI application entry point
 application = app
