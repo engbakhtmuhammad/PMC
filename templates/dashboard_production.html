@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMC School Management Systems</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; color: white; margin-bottom: 40px; }
+        .header h1 { font-size: 3rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .header p { font-size: 1.2rem; opacity: 0.9; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; text-align: center; color: white; }
+        .stat-number { font-size: 2.5rem; font-weight: bold; margin-bottom: 5px; }
+        .stat-label { font-size: 1rem; opacity: 0.8; }
+        .systems { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
+        .system-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.3s ease; }
+        .system-card:hover { transform: translateY(-5px); }
+        .system-header { display: flex; align-items: center; margin-bottom: 20px; }
+        .system-icon { font-size: 3rem; margin-right: 15px; }
+        .system-title { color: #333; font-size: 1.4rem; font-weight: bold; }
+        .system-description { color: #666; margin-bottom: 20px; line-height: 1.6; }
+        .features { margin-bottom: 25px; }
+        .feature-tag { display: inline-block; background: #e8f4fd; color: #2196F3; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; margin: 3px; }
+        .system-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 25px; border-radius: 25px; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; width: 100%; }
+        .system-button:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .footer { text-align: center; color: white; margin-top: 40px; opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ PMC School Management Systems</h1>
+            <p>Comprehensive Balochistan Education Management Platform</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_systems }}</div>
+                <div class="stat-label">Total Systems</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.active_systems }}</div>
+                <div class="stat-label">Active Systems</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_features }}</div>
+                <div class="stat-label">Total Features</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Availability</div>
+            </div>
+        </div>
+
+        <div class="systems">
+            {% for system_id, system in systems.items() %}
+            <div class="system-card">
+                <div class="system-header">
+                    <div class="system-icon">{{ system.icon }}</div>
+                    <div class="system-title">{{ system.name }}</div>
+                </div>
+                <div class="system-description">{{ system.description }}</div>
+                <div class="features">
+                    {% for feature in system.features %}
+                    <span class="feature-tag">{{ feature }}</span>
+                    {% endfor %}
+                </div>
+                <button class="system-button" onclick="window.open('{{ system.demo_url }}', '_blank')">
+                    Access System
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="footer">
+            <p>Last Updated: {{ stats.last_updated }} | PMC Education Department</p>
+        </div>
+    </div>
+</body>
+</html>

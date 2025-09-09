@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ system.name }} - PMC</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; border-radius: 20px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .header { text-align: center; margin-bottom: 30px; }
+        .system-icon { font-size: 4rem; margin-bottom: 15px; }
+        .system-title { color: #333; font-size: 2.5rem; font-weight: bold; margin-bottom: 10px; }
+        .system-description { color: #666; font-size: 1.2rem; line-height: 1.6; }
+        .demo-notice { background: #f8f9fa; border-left: 4px solid #2196F3; padding: 20px; margin: 30px 0; border-radius: 5px; }
+        .features { margin: 30px 0; }
+        .features h3 { color: #333; margin-bottom: 15px; }
+        .feature-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .feature-item { background: #e8f4fd; color: #2196F3; padding: 15px; border-radius: 10px; text-align: center; font-weight: 500; }
+        .back-button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 30px; border-radius: 25px; font-size: 1rem; cursor: pointer; margin-top: 30px; }
+        .back-button:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="system-icon">{{ system.icon }}</div>
+            <h1 class="system-title">{{ system.name }}</h1>
+            <p class="system-description">{{ system.description }}</p>
+        </div>
+
+        <div class="demo-notice">
+            <h3>🚀 System Ready for Deployment</h3>
+            <p>This system is part of the PMC School Management Suite. In the full deployment, this would provide complete access to {{ system.name }} functionality.</p>
+        </div>
+
+        <div class="features">
+            <h3>Available Features:</h3>
+            <div class="feature-list">
+                {% for feature in system.features %}
+                <div class="feature-item">{{ feature }}</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <button class="back-button" onclick="window.history.back()">
+            ← Back to Dashboard
+        </button>
+    </div>
+</body>
+</html>

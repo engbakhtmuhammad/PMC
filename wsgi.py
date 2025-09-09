@@ -8,8 +8,8 @@ import sys
 # Add the current directory to the Python path
 sys.path.insert(0, os.path.dirname(__file__))
 
-# Import the Flask app from dashboard
-from dashboard_app import app
+# Import the Flask app from production dashboard
+from dashboard_production import app
 
 # WSGI application entry point
 application = app
