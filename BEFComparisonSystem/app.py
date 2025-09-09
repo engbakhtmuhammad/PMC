@@ -955,12 +955,12 @@ if __name__ == '__main__':
     print("🏫 BEF-Government Schools Comparison System")
     print("=" * 50)
     print(f"📊 Server starting...")
-    print(f"🌐 Access the application at: http://localhost:5040")
+    print(f"🌐 Access the application at: http://localhost:5041")
     print(f"🛑 Use Ctrl+C to stop the server")
     print("=" * 50)
     
     # Get port from environment variable (for deployment) or use default
     import os
-    port = int(os.environ.get('PORT', 5040))
+    port = int(os.environ.get('PORT', 5041))
     
     app.run(debug=False, host='0.0.0.0', port=port)

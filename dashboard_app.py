@@ -9,7 +9,6 @@ import subprocess
 import threading
 import time
 import signal
-import psutil
 from datetime import datetime
 
 app = Flask(__name__)
@@ -65,15 +64,9 @@ running_processes = {}
 def kill_process_on_port(port):
     """Kill any process running on the specified port"""
     try:
-        for proc in psutil.process_iter(['pid', 'name', 'connections']):
-            try:
-                for conn in proc.info['connections']:
-                    if conn.laddr.port == port:
-                        proc.kill()
-                        print(f"Killed process {proc.pid} on port {port}")
-                        return True
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                continue
+        # Use lsof command to find and kill process on port
+        result = os.system(f"lsof -ti:{port} | xargs kill -9 2>/dev/null")
+        return result == 0
     except Exception as e:
         print(f"Error killing process on port {port}: {e}")
     return False
@@ -81,13 +74,9 @@ def kill_process_on_port(port):
 def check_port_in_use(port):
     """Check if a port is in use"""
     try:
-        for proc in psutil.process_iter(['pid', 'name', 'connections']):
-            try:
-                for conn in proc.info['connections']:
-                    if conn.laddr.port == port:
-                        return True
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                continue
+        # Use lsof to check if port is in use
+        result = os.system(f"lsof -i:{port} > /dev/null 2>&1")
+        return result == 0
     except Exception:
         pass
     return False
@@ -142,9 +131,6 @@ def start_system(system_id):
         # Start the system
         system_path = os.path.join('/Users/macbookpro/Desktop/PMC', system['path'])
         
-        # Update app.py to use the correct port
-        update_system_port(system_path, system['port'])
-        
         # Start the process
         cmd = f"cd '{system_path}' && python3 app.py"
         process = subprocess.Popen(
@@ -158,7 +144,7 @@ def start_system(system_id):
         running_processes[system_id] = process
         
         # Wait a bit for the process to start
-        time.sleep(3)
+        time.sleep(5)
         
         # Check if it's actually running
         if check_system_status(system_id) == 'running':
@@ -169,30 +155,21 @@ def start_system(system_id):
                 'status': 'running'
             })
         else:
-            return jsonify({'error': f'Failed to start {system["name"]}'}), 500
+            # Get error output
+            if process.poll() is not None:
+                _, stderr = process.communicate()
+                error_msg = stderr.decode('utf-8') if stderr else 'Unknown error'
+                return jsonify({'error': f'Failed to start {system["name"]}: {error_msg}'}), 500
+            else:
+                return jsonify({'error': f'Failed to start {system["name"]} - process timeout'}), 500
     
     except Exception as e:
         return jsonify({'error': f'Failed to start system: {str(e)}'}), 500
 
 def update_system_port(system_path, port):
     """Update the port in the system's app.py file"""
-    app_file = os.path.join(system_path, 'app.py')
-    if os.path.exists(app_file):
-        try:
-            with open(app_file, 'r') as f:
-                content = f.read()
-            
-            # Replace port configurations
-            content = content.replace('port=5040', f'port={port}')
-            content = content.replace('port=5000', f'port={port}')
-            content = content.replace(':5040', f':{port}')
-            content = content.replace(':5000', f':{port}')
-            
-            with open(app_file, 'w') as f:
-                f.write(content)
-                
-        except Exception as e:
-            print(f"Error updating port for {system_path}: {e}")
+    # This function is no longer needed since we fixed the ports directly
+    pass
 
 @app.route('/stop_system/<system_id>')
 def stop_system(system_id):

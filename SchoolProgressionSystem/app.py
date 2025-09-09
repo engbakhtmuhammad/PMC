@@ -917,4 +917,14 @@ def get_status():
     return jsonify(status)
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5020)
+    print("📈 School Progression Tracker")
+    print("=" * 50)
+    print(f"📊 Server starting...")
+    print(f"🌐 Access the application at: http://localhost:5044")
+    print(f"🛑 Use Ctrl+C to stop the server")
+    print("=" * 50)
+    
+    # Get port from environment variable (for deployment) or use default
+    port = int(os.environ.get('PORT', 5044))
+    
+    app.run(debug=False, host='0.0.0.0', port=port)
