@@ -1,0 +1,12 @@
+{
+  "name": "bef-schools-comparison",
+  "version": "1.0.0",
+  "description": "BEF vs Government Schools Comparison System",
+  "main": "wsgi.py",
+  "scripts": {
+    "start": "python wsgi.py"
+  },
+  "engines": {
+    "python": "3.9.x"
+  }
+}
