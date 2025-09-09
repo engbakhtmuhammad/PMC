@@ -3,21 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configure Analysis - BEF-Government Schools Comparison</title>
+    <title>Configure Analysis - BEF vs Government Schools</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
     <style>
         :root {
             --primary-color: #2563eb;
             --secondary-color: #0891b2;
             --success-color: #059669;
-            --warning-color: #d97706;
-            --danger-color: #dc2626;
-            --purple-color: #7c3aed;
             --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-secondary: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
             --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
         }
 
@@ -25,31 +20,11 @@
             font-family: 'Poppins', sans-serif;
             background: var(--gradient-primary);
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
         .main-container {
             padding: 2rem 0;
             min-height: 100vh;
-        }
-
-        .header-section {
-            text-align: center;
-            padding: 2rem 0;
-            color: white;
-        }
-
-        .header-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .header-subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            margin-bottom: 2rem;
         }
 
         .card-elegant {
@@ -60,6 +35,19 @@
             border: 1px solid rgba(255, 255, 255, 0.8);
             margin-bottom: 2rem;
             overflow: hidden;
+        }
+
+        .header-section {
+            text-align: center;
+            padding: 2rem;
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
         }
 
         .config-section {
@@ -94,29 +82,11 @@
             margin: 0;
         }
 
-        .section-description {
-            color: #64748b;
-            margin: 0;
-            font-size: 0.9rem;
-        }
-
-        .form-group {
-            margin-bottom: 2rem;
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.75rem;
-            display: block;
-        }
-
         .form-control {
             border-radius: 1rem;
             border: 2px solid #e5e7eb;
             padding: 1rem;
             font-size: 1rem;
-            transition: all 0.3s ease;
         }
 
         .form-control:focus {
@@ -135,30 +105,11 @@
 
         .range-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            appearance: none;
             width: 24px;
             height: 24px;
             border-radius: 50%;
             background: var(--primary-color);
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .range-slider::-moz-range-thumb {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .range-display {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 0.5rem;
         }
 
         .range-value {
@@ -170,77 +121,12 @@
             font-size: 0.9rem;
         }
 
-        .range-labels {
-            display: flex;
-            justify-content: space-between;
-            color: #6b7280;
-            font-size: 0.8rem;
-            margin-top: 0.25rem;
-        }
-
-        .district-selection {
-            margin-bottom: 2rem;
-        }
-
-        .district-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .select-all-btn {
-            background: none;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 0.5rem 1rem;
-            border-radius: 0.75rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .select-all-btn:hover,
-        .select-all-btn.active {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .search-box {
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 1rem 1rem 1rem 3rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 1rem;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #9ca3af;
-        }
-
-        .filter-grid {
+        .district-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1rem;
             max-height: 400px;
             overflow-y: auto;
-            padding: 0.5rem;
         }
 
         .district-card {
@@ -250,7 +136,6 @@
             padding: 1.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
         }
 
         .district-card:hover {
@@ -263,90 +148,15 @@
             background: rgba(37, 99, 235, 0.05);
         }
 
-        .district-checkbox {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            transform: scale(1.2);
-        }
-
         .district-name {
             font-weight: 600;
             color: #374151;
             margin-bottom: 0.5rem;
-            padding-right: 2rem;
         }
 
         .district-stats {
             display: flex;
             gap: 1rem;
-            color: #6b7280;
-            font-size: 0.9rem;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .analysis-options {
-            padding: 2rem;
-            background: rgba(15, 23, 42, 0.05);
-            margin-top: 2rem;
-        }
-
-        .option-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .option-card {
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .option-card:hover {
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
-        }
-
-        .option-card.selected {
-            border-color: var(--primary-color);
-            background: rgba(37, 99, 235, 0.05);
-        }
-
-        .option-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .option-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--gradient-primary);
-            color: white;
-        }
-
-        .option-title {
-            font-weight: 600;
-            color: #374151;
-            margin: 0;
-        }
-
-        .option-description {
             color: #6b7280;
             font-size: 0.9rem;
         }
@@ -360,14 +170,10 @@
             font-weight: 600;
             font-size: 1rem;
             transition: all 0.3s ease;
-            box-shadow: var(--shadow-lg);
-            position: relative;
-            overflow: hidden;
         }
 
         .btn-elegant:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
             color: white;
         }
 
@@ -375,31 +181,6 @@
             background: #9ca3af;
             cursor: not-allowed;
             transform: none;
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            margin-right: 1rem;
-        }
-
-        .btn-secondary:hover {
-            background: #4b5563;
-            color: white;
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         .summary-section {
@@ -437,20 +218,31 @@
 </head>
 <body>
     <div class="container main-container">
-        <!-- Header Section -->
-        <div class="header-section" data-aos="fade-down">
+        <!-- Header -->
+        <div class="header-section card-elegant">
             <h1 class="header-title">
                 <i class="fas fa-cogs me-3"></i>
                 Configure Analysis
             </h1>
-            <p class="header-subtitle">
-                Set your analysis parameters and select districts for comparison
-            </p>
+            <p class="mb-0">Set analysis parameters and select districts for comparison</p>
         </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
         <form method="POST" action="/analyze">
             <!-- Analysis Parameters -->
-            <div class="card-elegant" data-aos="fade-up">
+            <div class="card-elegant">
                 <div class="config-section">
                     <div class="section-header">
                         <div class="section-icon">
@@ -458,39 +250,35 @@
                         </div>
                         <div>
                             <h3 class="section-title">Analysis Parameters</h3>
-                            <p class="section-description">Configure distance thresholds and analysis settings</p>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold">
                                     <i class="fas fa-ruler me-2"></i>
                                     Maximum Distance for Proximity Analysis
                                 </label>
                                 <input type="range" class="range-slider" id="maxDistance" name="max_distance" 
-                                       min="0.5" max="50" step="0.5" value="10">
-                                <div class="range-display">
+                                       min="1" max="50" step="1" value="10">
+                                <div class="d-flex justify-content-between align-items-center mt-2">
                                     <div class="range-value" id="distanceValue">10 km</div>
-                                    <div class="range-labels">
-                                        <span>0.5 km</span>
-                                        <span>50 km</span>
-                                    </div>
+                                    <small class="text-muted">1 km - 50 km</small>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-lg-6">
-                            <div class="form-group">
-                                <label class="form-label" for="analysisType">
+                            <div class="form-group mb-3">
+                                <label class="form-label fw-bold" for="analysisType">
                                     <i class="fas fa-chart-bar me-2"></i>
-                                    Analysis Focus
+                                    Analysis Type
                                 </label>
                                 <select class="form-control" id="analysisType" name="analysis_type">
                                     <option value="proximity">Proximity Analysis (Distance-based)</option>
-                                    <option value="distribution">Distribution Analysis (Geographic spread)</option>
-                                    <option value="comprehensive">Comprehensive Analysis (Both)</option>
+                                    <option value="distribution">Distribution Analysis (Geographic)</option>
+                                    <option value="comprehensive">Comprehensive Analysis</option>
                                 </select>
                             </div>
                         </div>
@@ -499,7 +287,7 @@
             </div>
 
             <!-- District Selection -->
-            <div class="card-elegant" data-aos="fade-up" data-aos-delay="100">
+            <div class="card-elegant">
                 <div class="config-section">
                     <div class="section-header">
                         <div class="section-icon">
@@ -507,123 +295,67 @@
                         </div>
                         <div>
                             <h3 class="section-title">District Selection</h3>
-                            <p class="section-description">Choose districts to include in the analysis</p>
                         </div>
                     </div>
 
-                    <div class="district-selection">
-                        <div class="district-header">
-                            <div class="form-label mb-0">Select Districts for Analysis</div>
-                            <button type="button" class="select-all-btn" id="selectAllBtn" onclick="toggleSelectAll()">
-                                Select All
-                            </button>
-                        </div>
-
-                        <div class="search-box">
-                            <i class="fas fa-search search-icon"></i>
-                            <input type="text" class="search-input" id="districtSearch" 
-                                   placeholder="Search districts..." onkeyup="filterDistricts()">
-                        </div>
-
-                        <div class="filter-grid" id="districtGrid">
-                            {% if available_districts and district_stats %}
-                            {% for district in available_districts %}
-                            <div class="district-card">
-                                <input type="checkbox" class="district-checkbox" name="districts" value="{{ district }}">
-                                <div class="district-name">{{ district }}</div>
-                                <div class="district-stats">
-                                    <div class="stat-item">
-                                        <i class="fas fa-university"></i>
-                                        <span>{{ district_stats[district]['govt']|default(0) }}</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <i class="fas fa-graduation-cap"></i>
-                                        <span>{{ district_stats[district]['bef']|default(0) }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                            {% else %}
-                            <!-- Fallback content when no districts available server-side -->
-                            <div class="col-12 text-center p-4">
-                                <i class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
-                                <h5>No Districts Available</h5>
-                                <p class="text-muted">Please ensure both datasets are uploaded with valid district information.</p>
-                                <button class="btn btn-primary" onclick="window.location.href='/'">
-                                    <i class="fas fa-arrow-left me-2"></i>Back to Upload
-                                </button>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Analysis Options -->
-            <div class="card-elegant" data-aos="fade-up" data-aos-delay="200">
-                <div class="config-section">
-                    <div class="section-header">
-                        <div class="section-icon">
-                            <i class="fas fa-clipboard-list"></i>
-                        </div>
-                        <div>
-                            <h3 class="section-title">Output Options</h3>
-                            <p class="section-description">Choose what to include in your analysis results</p>
-                        </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="form-label fw-bold mb-0">Select Districts for Analysis</label>
+                        <button type="button" class="btn btn-outline-primary" id="selectAllBtn" onclick="toggleSelectAll()">
+                            Select All
+                        </button>
                     </div>
 
-                    <div class="option-grid">
-                        <div class="option-card selected" onclick="toggleOption(this, 'map')">
-                            <input type="checkbox" name="include_map" value="true" checked style="display: none;">
-                            <div class="option-header">
-                                <div class="option-icon">
-                                    <i class="fas fa-map"></i>
+                    <div class="district-grid" id="districtGrid">
+                        {% for district in available_districts %}
+                        <div class="district-card" data-district="{{ district }}" onclick="toggleDistrict(this, '{{ district }}')">
+                            <input type="checkbox" name="districts" value="{{ district }}" style="display: none;">
+                            <div class="district-name">{{ district }}</div>
+                            <div class="district-stats">
+                                <div class="me-3">
+                                    <i class="fas fa-university text-primary"></i>
+                                    <span>{{ district_stats[district]['govt'] }} Govt</span>
                                 </div>
-                                <h4 class="option-title">Interactive Map</h4>
-                            </div>
-                            <p class="option-description">Generate an interactive map showing school locations and proximity relationships</p>
-                        </div>
-
-                        <div class="option-card selected" onclick="toggleOption(this, 'statistics')">
-                            <input type="checkbox" name="include_statistics" value="true" checked style="display: none;">
-                            <div class="option-header">
-                                <div class="option-icon">
-                                    <i class="fas fa-chart-pie"></i>
+                                <div>
+                                    <i class="fas fa-graduation-cap text-danger"></i>
+                                    <span>{{ district_stats[district]['bef'] }} BEF</span>
                                 </div>
-                                <h4 class="option-title">Statistical Summary</h4>
                             </div>
-                            <p class="option-description">Detailed statistics on distances, distributions, and proximity patterns</p>
                         </div>
-
-                        <div class="option-card selected" onclick="toggleOption(this, 'download')">
-                            <input type="checkbox" name="include_download" value="true" checked style="display: none;">
-                            <div class="option-header">
-                                <div class="option-icon">
-                                    <i class="fas fa-download"></i>
-                                </div>
-                                <h4 class="option-title">CSV Export</h4>
-                            </div>
-                            <p class="option-description">Download detailed results as CSV file for further analysis</p>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
 
             <!-- Summary Section -->
-            <div class="card-elegant" data-aos="fade-up" data-aos-delay="300">
+            <div class="card-elegant">
                 <div class="summary-section">
                     <h4 class="text-center mb-3">Analysis Summary</h4>
-                    <div class="summary-grid" id="summaryGrid">
-                        <!-- Summary will be populated dynamically -->
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-value">{{ total_govt_schools }}</div>
+                            <div class="summary-label">Government Schools</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value">{{ total_bef_schools }}</div>
+                            <div class="summary-label">BEF Schools</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value" id="selectedCount">0</div>
+                            <div class="summary-label">Selected Districts</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-value" id="maxDistanceDisplay">10 km</div>
+                            <div class="summary-label">Max Distance</div>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="text-center pt-4">
-                    <button type="button" class="btn-elegant btn-secondary" onclick="window.history.back()">
+                    <a href="/" class="btn btn-secondary me-3">
                         <i class="fas fa-arrow-left me-2"></i>
                         Back to Upload
-                    </button>
-                    <button type="submit" class="btn-elegant" id="analyzeBtn">
+                    </a>
+                    <button type="submit" class="btn-elegant" id="analyzeBtn" disabled>
                         <i class="fas fa-play me-2"></i>
                         Start Analysis
                     </button>
@@ -632,322 +364,90 @@
         </form>
     </div>
 
-        <!-- Scripts -->
-        <!-- Embedded districts data as JSON (kept outside executable JS to prevent parse errors) -->
-        <script id="districts-data" type="application/json">
-    {% if available_districts and district_stats -%}
-    [
-    {%- for district in available_districts -%}
-    {"name":"{{ district|e }}","govt_schools":{{ district_stats[district]['govt']|default(0) }},"bef_schools":{{ district_stats[district]['bef']|default(0) }},"total_schools":{{ (district_stats[district]['govt'] + district_stats[district]['bef'])|default(0) }} }{%- if not loop.last %},{% endif -%}
-    {%- endfor -%}
-    ]
-    {%- else -%}
-    []
-    {%- endif %}
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-        <script>
-        // Global variables
-        let districts = [];
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
         let selectedDistricts = [];
         let allSelected = false;
-        
-        // Initialize with server-side data if available (loaded from embedded JSON to avoid template tags in JS)
-        const districtsDataEl = document.getElementById('districts-data');
-        if (districtsDataEl) {
-            try {
-                const parsed = JSON.parse(districtsDataEl.textContent);
-                if (Array.isArray(parsed)) {
-                    districts = parsed;
-                }
-            } catch (err) {
-                console.error('Failed to parse embedded districts JSON:', err);
-            }
-        }
-        <!-- Removed invalid Jinja block: districts are initialized from embedded JSON above -->
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Use server-side data if available, otherwise load from API
-            if (districts.length > 0) {
-                renderDistricts();
-                updateSummary();
-            } else {
-                loadDistricts();
-            }
-            setupRangeSlider();
+        // Range slider handling
+        document.getElementById('maxDistance').addEventListener('input', function() {
+            const value = this.value;
+            document.getElementById('distanceValue').textContent = value + ' km';
+            document.getElementById('maxDistanceDisplay').textContent = value + ' km';
         });
 
-        // Load districts from backend (fallback for client-side updates)
-        function loadDistricts() {
-            fetch('/districts')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    districts = data.districts;
-                    renderDistricts();
-                    updateSummary();
-                } else {
-                    throw new Error(data.message || 'Failed to load districts');
-                }
-            })
-            .catch(error => {
-                console.error('Error loading districts:', error);
-                showError(`Failed to load districts: ${error.message}`);
-                // Keep any existing districts from server-side render
-            });
-        }
-
-        // Render district cards
-        function renderDistricts() {
-            const grid = document.getElementById('districtGrid');
-            
-            if (!districts || districts.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-12 text-center p-4">
-                        <i class="fas fa-exclamation-circle fa-3x text-warning mb-3"></i>
-                        <h5>No Districts Available</h5>
-                        <p class="text-muted">Please ensure both datasets are uploaded with valid district information.</p>
-                        <button class="btn btn-primary" onclick="window.location.href='/'">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Upload
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = '';
-            console.log('Rendering districts:', districts);
-
-            districts.forEach((district, index) => {
-                const card = document.createElement('div');
-                card.className = 'district-card';
-                card.onclick = () => toggleDistrict(district.name, card);
-                
-                card.innerHTML = `
-                    <input type="checkbox" class="district-checkbox" name="districts" value="${district.name}">
-                    <div class="district-name">${district.name}</div>
-                    <div class="district-stats">
-                        <div class="stat-item">
-                            <i class="fas fa-university"></i>
-                            <span>${district.govt_schools || 0}</span>
-                        </div>
-                        <div class="stat-item">
-                            <i class="fas fa-graduation-cap"></i>
-                            <span>${district.bef_schools || 0}</span>
-                        </div>
-                    </div>
-                `;
-                
-                grid.appendChild(card);
-            });
-            
-            console.log(`Rendered ${districts.length} district cards`);
-        }
-
-        // Toggle district selection
-        function toggleDistrict(districtName, card) {
+        // District selection
+        function toggleDistrict(card, district) {
             const checkbox = card.querySelector('input[type="checkbox"]');
             checkbox.checked = !checkbox.checked;
             
             if (checkbox.checked) {
                 card.classList.add('selected');
-                if (!selectedDistricts.includes(districtName)) {
-                    selectedDistricts.push(districtName);
+                if (!selectedDistricts.includes(district)) {
+                    selectedDistricts.push(district);
                 }
             } else {
                 card.classList.remove('selected');
-                selectedDistricts = selectedDistricts.filter(d => d !== districtName);
+                selectedDistricts = selectedDistricts.filter(d => d !== district);
                 allSelected = false;
                 document.getElementById('selectAllBtn').textContent = 'Select All';
-                document.getElementById('selectAllBtn').classList.remove('active');
             }
             
             updateSummary();
         }
 
-        // Toggle select all districts
+        // Select all districts
         function toggleSelectAll() {
             const btn = document.getElementById('selectAllBtn');
             const cards = document.querySelectorAll('.district-card');
-            const checkboxes = document.querySelectorAll('.district-checkbox');
             
             allSelected = !allSelected;
             
-            cards.forEach((card, index) => {
+            cards.forEach(card => {
+                const checkbox = card.querySelector('input[type="checkbox"]');
+                const district = card.dataset.district;
+                
                 if (allSelected) {
                     card.classList.add('selected');
-                    checkboxes[index].checked = true;
+                    checkbox.checked = true;
+                    if (!selectedDistricts.includes(district)) {
+                        selectedDistricts.push(district);
+                    }
                 } else {
                     card.classList.remove('selected');
-                    checkboxes[index].checked = false;
+                    checkbox.checked = false;
+                    selectedDistricts = [];
                 }
             });
             
-            if (allSelected) {
-                selectedDistricts = districts.map(d => d.name);
-                btn.textContent = 'Deselect All';
-                btn.classList.add('active');
-            } else {
-                selectedDistricts = [];
-                btn.textContent = 'Select All';
-                btn.classList.remove('active');
-            }
-            
+            btn.textContent = allSelected ? 'Deselect All' : 'Select All';
             updateSummary();
         }
 
-        // Filter districts
-        function filterDistricts() {
-            const searchTerm = document.getElementById('districtSearch').value.toLowerCase();
-            const cards = document.querySelectorAll('.district-card');
+        // Update summary and button state
+        function updateSummary() {
+            document.getElementById('selectedCount').textContent = selectedDistricts.length;
             
-            cards.forEach(card => {
-                const districtName = card.querySelector('.district-name').textContent.toLowerCase();
-                if (districtName.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        // Setup range slider
-        function setupRangeSlider() {
-            const slider = document.getElementById('maxDistance');
-            const valueDisplay = document.getElementById('distanceValue');
-            
-            slider.addEventListener('input', function() {
-                valueDisplay.textContent = this.value + ' km';
-                updateSummary();
-            });
-        }
-
-        // Toggle output options
-        function toggleOption(card, optionType) {
-            const checkbox = card.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
-            
-            if (checkbox.checked) {
-                card.classList.add('selected');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            if (selectedDistricts.length > 0) {
+                analyzeBtn.disabled = false;
             } else {
-                card.classList.remove('selected');
+                analyzeBtn.disabled = true;
             }
         }
 
-        // Update summary
-        function updateSummary() {
-            fetch('/status')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const summaryGrid = document.getElementById('summaryGrid');
-                const maxDistance = document.getElementById('maxDistance').value;
-                
-                summaryGrid.innerHTML = `
-                    <div class="summary-item">
-                        <div class="summary-value">${data.total_govt_schools || 0}</div>
-                        <div class="summary-label">Government Schools</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-value">${data.total_bef_schools || 0}</div>
-                        <div class="summary-label">BEF Schools</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-value">${selectedDistricts.length}</div>
-                        <div class="summary-label">Selected Districts</div>
-                    </div>
-                    <div class="summary-item">
-                        <div class="summary-value">${maxDistance} km</div>
-                        <div class="summary-label">Max Distance</div>
-                    </div>
-                `;
-                
-                // Enable/disable analyze button with better logic
-                const analyzeBtn = document.getElementById('analyzeBtn');
-                const hasData = data.ready_for_analysis && data.total_govt_schools > 0 && data.total_bef_schools > 0;
-                const hasSelection = selectedDistricts.length > 0;
-                
-                console.log('Button enable check:', {
-                    hasData,
-                    hasSelection,
-                    selectedDistricts: selectedDistricts.length,
-                    ready: data.ready_for_analysis
-                });
-                
-                if (hasData && hasSelection) {
-                    analyzeBtn.disabled = false;
-                    analyzeBtn.classList.remove('btn-disabled');
-                } else {
-                    analyzeBtn.disabled = true;
-                    analyzeBtn.classList.add('btn-disabled');
-                }
-            })
-            .catch(error => {
-                console.error('Error updating summary:', error);
-                showError(`Failed to update summary: ${error.message}`);
-                
-                // Fallback: enable button if we have districts and selections
-                const analyzeBtn = document.getElementById('analyzeBtn');
-                if (selectedDistricts.length > 0 && districts.length > 0) {
-                    analyzeBtn.disabled = false;
-                }
-            });
-        }
-
-        // Handle form submission
+        // Form submission
         document.querySelector('form').addEventListener('submit', function(e) {
-            const analyzeBtn = document.getElementById('analyzeBtn');
-            analyzeBtn.disabled = true;
-            analyzeBtn.innerHTML = `
-                <div class="loading-spinner me-2"></div>
-                Analyzing...
-            `;
+            if (selectedDistricts.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one district for analysis.');
+                return;
+            }
+            
+            const btn = document.getElementById('analyzeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Analyzing...';
         });
-
-        function showError(message) {
-            // Create a more elegant error notification
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'alert alert-danger alert-dismissible fade show';
-            errorDiv.style.cssText = `
-                position: fixed;
-                top: 2rem;
-                right: 2rem;
-                z-index: 9999;
-                max-width: 400px;
-                box-shadow: var(--shadow-lg);
-            `;
-            errorDiv.innerHTML = `
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                <strong>Error:</strong> ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            
-            document.body.appendChild(errorDiv);
-            
-            // Auto-remove after 8 seconds
-            setTimeout(() => {
-                if (errorDiv.parentNode) {
-                    errorDiv.remove();
-                }
-            }, 8000);
-            
-            // Also log to console for debugging
-            console.error('User Error:', message);
-        }
-
-        // Periodic summary updates
-        setInterval(updateSummary, 10000);
     </script>
 </body>
 </html>
