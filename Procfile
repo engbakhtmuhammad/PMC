@@ -1,1 +1,1 @@
-web: cd BEFComparisonSystem && python app.py
+web: gunicorn wsgi:application --bind 0.0.0.0:$PORT

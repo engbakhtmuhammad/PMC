@@ -3,8 +3,8 @@ services:
     name: bef-schools-comparison
     env: python
     plan: free
-    buildCommand: cd BEFComparisonSystem && pip install -r requirements.txt
-    startCommand: cd BEFComparisonSystem && python app.py
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.18
