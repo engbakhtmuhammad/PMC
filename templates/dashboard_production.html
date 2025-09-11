@@ -16,8 +16,11 @@
         .stat-number { font-size: 2.5rem; font-weight: bold; margin-bottom: 5px; }
         .stat-label { font-size: 1rem; opacity: 0.8; }
         .systems { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; }
-        .system-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.3s ease; }
+        .system-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.3s ease; position: relative; }
         .system-card:hover { transform: translateY(-5px); }
+        .status-badge { position: absolute; top: 15px; right: 15px; padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; }
+        .status-available { background: #e8f5e8; color: #2e7d32; }
+        .status-demo { background: #fff3e0; color: #ef6c00; }
         .system-header { display: flex; align-items: center; margin-bottom: 20px; }
         .system-icon { font-size: 3rem; margin-right: 15px; }
         .system-title { color: #333; font-size: 1.4rem; font-weight: bold; }
@@ -58,6 +61,9 @@
         <div class="systems">
             {% for system_id, system in systems.items() %}
             <div class="system-card">
+                <div class="status-badge status-{{ system.status }}">
+                    {% if system.available %}✅ LIVE{% else %}📋 DEMO{% endif %}
+                </div>
                 <div class="system-header">
                     <div class="system-icon">{{ system.icon }}</div>
                     <div class="system-title">{{ system.name }}</div>
@@ -68,8 +74,12 @@
                     <span class="feature-tag">{{ feature }}</span>
                     {% endfor %}
                 </div>
-                <button class="system-button" onclick="window.open('{{ system.demo_url }}', '_blank')">
-                    Access System
+                <button class="system-button" onclick="window.open('{{ system.url }}', '_blank')">
+                    {% if system.available %}
+                    🚀 Launch System
+                    {% else %}
+                    📋 View Demo
+                    {% endif %}
                 </button>
             </div>
             {% endfor %}
